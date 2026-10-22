@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: org-redesign-studio
+    runtime: docker
+    plan: starter          # el plan gratuito se duerme tras 15 min sin uso; para la sesión usa starter
+    numInstances: 1        # una sola instancia: el estado vive en memoria
+    healthCheckPath: /api/estado
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: ORG_MODEL
+        value: claude-sonnet-5-5

@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+data/org_asis.json
+data/org_asis.csv

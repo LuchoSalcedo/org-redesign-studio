@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Org Redesign Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%233987e5%27/%3E%3C/svg%3E">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0e1014; --surface:#161920; --surface-2:#1d212a; --border:#2a2f3a; --border-2:#384050;
+  --text:#eceae4; --text-2:#b9b7ae; --text-3:#8d8b83;
+  --antes:#7d7b74; --despues:#3987e5;
+  --pensando:#3987e5; --trabajando:#e0a020; --listo:#2fbf87; --error:#e66767; --objecion:#e8833a;
+  --producto:#3987e5; --plataforma:#9085e9; --habilitador:#7d7b74;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;overflow:hidden}
+.app{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
+header{display:flex;align-items:center;gap:20px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
+.brand{display:flex;flex-direction:column;min-width:0}
+.brand b{font-size:18px;letter-spacing:.2px}
+.brand span{font-size:13px;color:var(--text-3)}
+.fase{flex:1;display:flex;align-items:center;gap:10px;min-width:260px}
+.fase .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border-2);font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.fase .pill .dot{width:8px;height:8px;border-radius:50%;background:var(--text-3);flex:none}
+.corriendo .fase .pill .dot{background:var(--pensando);animation:pulso 1.2s infinite}
+.reloj{font:600 20px var(--mono);color:var(--text-2);min-width:70px;text-align:right}
+.controles{display:none;gap:8px}
+.admin .controles{display:flex}
+.controles button{background:var(--surface-2);color:var(--text);border:1px solid var(--border-2);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.controles button.primario{background:var(--despues);border-color:var(--despues);color:#fff}
+.controles button:disabled{opacity:.4;cursor:default}
+main{display:grid;grid-template-columns:minmax(330px,22vw) 1fr minmax(300px,20vw);gap:14px;padding:14px;min-height:0}
+.col{display:flex;flex-direction:column;gap:12px;min-height:0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-height:0}
+.panel h2{font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.panel h2 small{text-transform:none;letter-spacing:0;font-weight:500}
+/* agentes */
+#agentes{display:flex;flex-direction:column;gap:8px;overflow:auto;min-height:0;flex:1}
+.agente{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;transition:border-color .3s, box-shadow .3s;flex:1 1 0;min-height:86px}
+.agente.activo{border-color:var(--pensando);box-shadow:0 0 0 1px var(--pensando) inset}
+.agente.trabajando{border-color:var(--trabajando);box-shadow:0 0 0 1px var(--trabajando) inset}
+.agente .cab{display:flex;align-items:center;gap:8px}
+.agente .ico{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--surface-2);font-size:13px;font-weight:700;color:var(--text-2);flex:none}
+.agente .nom{font-weight:700;font-size:15px;line-height:1.2}
+.agente .rol{font-size:12px;color:var(--text-3)}
+.agente .est{margin-left:auto;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;color:var(--text-3)}
+.agente .est i{width:8px;height:8px;border-radius:50%;background:var(--text-3)}
+.agente[data-estado="pensando"] .est{color:var(--pensando)} .agente[data-estado="pensando"] .est i{background:var(--pensando);animation:pulso 1s infinite}
+.agente[data-estado="trabajando"] .est{color:var(--trabajando)} .agente[data-estado="trabajando"] .est i{background:var(--trabajando);animation:pulso .6s infinite}
+.agente[data-estado="listo"] .est{color:var(--listo)} .agente[data-estado="listo"] .est i{background:var(--listo)}
+.agente .txt{-webkit-mask-image:linear-gradient(transparent,#000 14px);mask-image:linear-gradient(transparent,#000 14px);padding-top:4px;font-size:13px;line-height:1.45;color:var(--text-2);white-space:pre-wrap;overflow:auto;flex:1;min-height:0;scrollbar-width:thin}
+.agente .txt:empty::before{content:"En espera";color:var(--text-3);font-style:italic}
+.agente .tool{font:12px var(--mono);color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agente .tool b{color:var(--trabajando);font-weight:600}
+@keyframes pulso{0%,100%{opacity:1}50%{opacity:.25}}
+/* centro */
+.centro{display:grid;grid-template-rows:minmax(0,1.15fr) minmax(0,1fr);gap:12px;min-height:0}
+.abajo{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;min-height:0}
+.leyenda{display:flex;gap:14px;font-size:12px;color:var(--text-2);text-transform:none;letter-spacing:0;font-weight:500}
+.leyenda span{display:inline-flex;align-items:center;gap:6px}
+.leyenda i{width:12px;height:12px;border-radius:3px;display:inline-block}
+svg text{fill:var(--text-2);font-size:12px}
+.vacio{height:100%;display:grid;place-items:center;color:var(--text-3);font-size:14px;text-align:center;padding:20px}
+#piramide,#tramos,#modelo{height:calc(100% - 28px);position:relative}
+.barra{transition:width .9s cubic-bezier(.3,.7,.2,1), x .9s cubic-bezier(.3,.7,.2,1)}
+/* modelo */
+#modelo{display:flex;flex-direction:column;gap:8px;overflow:auto}
+.banda{display:flex;flex-direction:column;gap:5px}
+.banda .tit{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.banda .tit i{width:10px;height:10px;border-radius:3px}
+.bloques{display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.bloque{background:var(--surface-2);border:1px solid var(--border);border-left:4px solid var(--c);border-radius:8px;padding:7px 9px;animation:entra .5s ease both}
+.bloque b{display:block;font-size:13px;line-height:1.25}
+.bloque span{display:block;font-size:12px;color:var(--text-3);margin-top:2px}
+.bloque em{font-style:normal;color:var(--text);font-weight:600}
+@keyframes entra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* kpis */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+.kpi.ancho{grid-column:span 2}
+.kpi .lbl{font-size:12px;color:var(--text-3);font-weight:600}
+.kpi .val{display:flex;align-items:baseline;gap:8px;margin-top:4px;flex-wrap:wrap}
+.kpi .antes{font:600 18px var(--mono);color:var(--antes)}
+.kpi .flecha{color:var(--text-3);font-size:14px}
+.kpi .desp{font:700 26px var(--mono);color:var(--text)}
+.kpi .delta{font-size:12px;font-weight:700;color:var(--listo)}
+.kpi.pendiente .desp{color:var(--text-3)}
+#chro{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.veredicto{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:16px;letter-spacing:.5px;padding:6px 12px;border-radius:8px;align-self:flex-start}
+.veredicto.objetado{background:rgba(232,131,58,.15);color:var(--objecion);border:1px solid var(--objecion)}
+.veredicto.aprobado{background:rgba(47,191,135,.12);color:var(--listo);border:1px solid var(--listo)}
+#chro ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+#chro li{font-size:13px;color:var(--text-2);padding-left:14px;position:relative}
+#chro li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--objecion)}
+#chro li.ok::before{background:var(--listo)}
+.historial{font:12px var(--mono);color:var(--text-3);display:flex;flex-direction:column;gap:2px}
+.historial b{color:var(--text-2)}
+footer{display:flex;align-items:center;gap:12px;padding:8px 20px;border-top:1px solid var(--border);background:var(--surface);font-size:13px;color:var(--text-2);white-space:nowrap;overflow:hidden}
+footer .lbl{color:var(--text-3);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.6px}
+footer #ticker{overflow:hidden;text-overflow:ellipsis}
+footer a{color:var(--text-3);margin-left:auto}
+#tip{position:fixed;pointer-events:none;background:#000c;border:1px solid var(--border-2);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text);display:none;z-index:10;max-width:280px}
+#qr{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:20}
+#qr .caja{background:#fff;color:#111;border-radius:16px;padding:28px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+#qr .caja b{font-size:22px}#qr .caja span{font:16px var(--mono)}
+/* pantallas medianas (laptop o proyector escalado) */
+@media (max-width: 1500px) and (min-width: 901px){
+  main{grid-template-columns:minmax(250px,21vw) minmax(0,1fr) minmax(230px,19vw);gap:10px;padding:10px}
+  .controles button{padding:6px 8px;font-size:12px}
+  .brand span{display:none}
+  .panel h2 small{display:none}
+  .agente .rol{display:none}
+  .agente{min-height:112px;flex:0 0 auto}
+  .agente .txt{max-height:72px}
+}
+/* celular */
+@media (max-width: 900px){
+  body{overflow:auto}
+  .app{height:auto}
+  header{flex-wrap:wrap;gap:8px;padding:10px 14px}
+  .controles{flex-wrap:wrap}
+  .fase{min-width:0}
+  .fase{order:3;flex-basis:100%}
+  main{grid-template-columns:minmax(0,1fr);padding:10px;gap:10px}
+  .kpis{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .kpi .desp{font-size:22px}
+  .reloj{margin-left:auto}
+  .col{display:contents}
+  .col.centro{display:grid}
+  .kpis{order:1} .centro{order:2;grid-template-rows:auto auto} #agentes{order:3}
+  .abajo{grid-template-columns:1fr}
+  #piramide{height:320px} #tramos{height:220px} #modelo{height:auto}
+  .agente{min-height:0;flex:none} .agente .txt{max-height:110px}
+  .agente:not(.activo):not(.trabajando) .txt{display:none}
+  #panelChro{order:4}
+  footer{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="brand"><b>Org Redesign Studio</b><span id="empresa">Consumo Andino S.A.A. · empresa ficticia</span></div>
+    <div class="fase"><span class="pill"><span class="dot"></span><span id="fase">Conectando…</span></span></div>
+    <div class="reloj" id="reloj">0:00</div>
+    <div class="controles">
+      <button class="primario" data-modo="vivo" id="bVivo">▶ En vivo</button>
+      <button data-modo="guion">▶ Guion de respaldo</button>
+      <button data-modo="grabacion" id="bGrab">▶ Repetir grabación</button>
+      <button id="bReiniciar">↺ Reiniciar</button>
+      <button id="bQR">QR</button>
+    </div>
+  </header>
+  <main>
+    <section class="col" aria-label="Agentes"><div id="agentes"></div></section>
+    <section class="col centro">
+      <div class="panel">
+        <h2>Pirámide por capas <span class="leyenda"><span><i style="background:var(--antes)"></i>Hoy</span><span><i style="background:var(--despues)"></i>Propuesta</span></span></h2>
+        <div id="piramide"></div>
+      </div>
+      <div class="abajo">
+        <div class="panel"><h2><span id="tituloModelo">Organización actual por área</span> <small id="subModelo"></small></h2><div id="modelo"></div></div>
+        <div class="panel"><h2>Tramos de control <small>jefes por número de reportes</small></h2><div id="tramos"></div></div>
+      </div>
+    </section>
+    <section class="col">
+      <div class="kpis" id="kpis"></div>
+      <div class="panel" id="panelChro" style="flex:1;display:flex;flex-direction:column"><h2>Revisión del CHRO</h2><div id="chro"></div></div>
+    </section>
+  </main>
+  <footer><span class="lbl">Bitácora</span><span id="ticker">—</span><a href="/api/descargar/actual.csv">Descargar organigrama actual (CSV)</a></footer>
+</div>
+<div id="tip"></div>
+<div id="qr"><div class="caja"><b>Sigan a los agentes en vivo</b><div id="qrcode"></div><span id="qrurl"></span></div></div>
+
+<script>
+// La clave del presentador se guarda en la pestaña y se borra de la barra de direcciones,
+// para que no quede visible en el proyector.
+const params = new URLSearchParams(location.search);
+let TOKEN = params.get('admin');
+try {
+  if (TOKEN) { sessionStorage.setItem('orgAdmin', TOKEN); history.replaceState(null, '', location.pathname); }
+  else TOKEN = sessionStorage.getItem('orgAdmin');
+} catch (e) {}
+if (TOKEN) document.getElementById('app').classList.add('admin');
+const $ = s => document.querySelector(s);
+const fmt = n => typeof n === 'number' ? n.toLocaleString('es-PE', {maximumFractionDigits: 1}) : n;
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const INICIALES = {diagnostico:'D', capacidades:'C', disenador:'P', optimizador:'S', impacto:'$', chro:'H'};
+const ESTADOS = {'en espera':'En espera', pensando:'Pensando', trabajando:'Calculando', listo:'Listo', error:'Error'};
+
+let E = null;       // estado (mismo esquema que app/bus.py)
+let empresa = null;
+
+// ------------------------------------------------------------------ reducer (espejo de bus.aplicar)
+function estadoInicial(){
+  const ag = {};
+  (empresa?.agentes || []).forEach(a => ag[a.id] = {...a, estado:'en espera', texto:'', herramientas:[], ronda:1});
+  return {corrida:{estado:'lista', modo:null, inicio:null, fin:null, fase:'Esperando al partner'}, agentes:ag, datos:{}, bitacora:[]};
+}
+function aplicar(ev){
+  const t = ev.type;
+  if (t === 'reset'){ E = estadoInicial(); }
+  else if (t === 'run_start'){ E = estadoInicial(); Object.assign(E.corrida, {estado:'corriendo', modo:ev.modo, inicio:ev.ts}); }
+  else if (t === 'phase'){ E.corrida.fase = ev.name; E.bitacora.push({ts:ev.ts, texto:ev.name}); }
+  else if (t === 'agent_status'){ const a = E.agentes[ev.agent]; a.estado = ev.status;
+    if (ev.ronda){ a.ronda = ev.ronda; if (ev.status === 'pensando' && ev.ronda > 1) a.texto += '\n\n— Ronda 2 —\n'; } }
+  else if (t === 'agent_text'){ E.agentes[ev.agent].texto += ev.delta; }
+  else if (t === 'agent_tool'){ E.agentes[ev.agent].herramientas.push({herramienta:ev.tool, resumen:ev.summary}); E.bitacora.push({ts:ev.ts, texto:ev.summary, agente:ev.agent}); }
+  else if (t === 'data'){ E.datos[ev.key] = ev.value;
+    if (ev.key === 'tobe'){ (E.datos.tobe_historial ||= []).push({capas:ev.value.metricas.capas, jefaturas:ev.value.metricas.jefaturas, tramo_promedio:ev.value.metricas.tramo_promedio}); } }
+  else if (t === 'run_end'){ Object.assign(E.corrida, {estado: ev.estado || 'terminada', fin: ev.ts, fase: ev.fase || 'Diseño listo'}); }
+}
+
+// ------------------------------------------------------------------ render
+let pendiente = false;
+function render(){ if (!pendiente){ pendiente = true; requestAnimationFrame(() => { pendiente = false; dibujar(); }); } }
+
+function dibujar(){
+  if (!E) return;
+  document.getElementById('app').classList.toggle('corriendo', E.corrida.estado === 'corriendo');
+  $('#fase').textContent = E.corrida.fase;
+  const ult = E.bitacora[E.bitacora.length - 1];
+  $('#ticker').textContent = ult ? (ult.agente ? `${E.agentes[ult.agente]?.nombre}: ` : '') + ult.texto : '—';
+  document.querySelectorAll('.controles button[data-modo]').forEach(b => b.disabled = E.corrida.estado === 'corriendo');
+  agentes(); piramide(); tramos(); modelo(); kpis(); chro();
+}
+
+function agentes(){
+  const cont = $('#agentes');
+  Object.values(E.agentes).forEach(a => {
+    let el = document.getElementById('ag-' + a.id);
+    if (!el){
+      el = document.createElement('article'); el.className = 'agente'; el.id = 'ag-' + a.id;
+      el.innerHTML = `<div class="cab"><div class="ico">${INICIALES[a.id] || '·'}</div><div><div class="nom">${esc(a.nombre)}</div><div class="rol">${esc(a.rol)}</div></div><div class="est"><i></i><span></span></div></div><div class="txt"></div><div class="tool"></div>`;
+      cont.appendChild(el);
+    }
+    if (el.dataset.estado !== a.estado && (a.estado === 'pensando' || a.estado === 'trabajando'))
+      el.scrollIntoView({block: 'nearest', behavior: 'smooth'});
+    el.dataset.estado = a.estado;
+    el.classList.toggle('activo', a.estado === 'pensando');
+    el.classList.toggle('trabajando', a.estado === 'trabajando');
+    el.querySelector('.est span').textContent = (ESTADOS[a.estado] || a.estado) + (a.ronda > 1 ? ' · ronda 2' : '');
+    const txt = el.querySelector('.txt');
+    if (txt.textContent !== a.texto.trim()){ txt.textContent = a.texto.trim(); txt.scrollTop = txt.scrollHeight; }
+    const h = a.herramientas[a.herramientas.length - 1];
+    el.querySelector('.tool').innerHTML = h ? `<b>⚙</b> ${esc(h.resumen)}` : '';
+  });
+}
+
+function svgEl(cont){
+  const w = cont.clientWidth, h = cont.clientHeight;
+  let svg = cont.querySelector('svg');
+  if (!svg){ cont.innerHTML = ''; svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); cont.appendChild(svg); }
+  svg.setAttribute('width', w); svg.setAttribute('height', h); svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  return [svg, w, h];
+}
+function nodo(svg, tag, attrs, id){
+  let n = id ? svg.querySelector(`[data-k="${id}"]`) : null;
+  if (!n){ n = document.createElementNS('http://www.w3.org/2000/svg', tag); if (id) n.dataset.k = id; svg.appendChild(n); }
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  return n;
+}
+
+function piramide(){
+  const cont = $('#piramide');
+  const asis = E.datos.asis, tobe = E.datos.tobe;
+  if (!asis){ cont.innerHTML = `<div class="vacio">La pirámide aparece cuando el agente de diagnóstico mida la organización.<br>${empresa ? fmt(empresa.personas) + ' personas esperando' : ''}</div>`; return; }
+  const [svg, w, h] = svgEl(cont);
+  const capas = Math.max(asis.capas, tobe?.metricas.capas || 0);
+  const A = Object.fromEntries(asis.piramide.map(r => [r.capa, r.personas]));
+  const T = tobe ? Object.fromEntries(tobe.metricas.piramide.map(r => [r.capa, r.personas])) : {};
+  const max = Math.max(...Object.values(A), ...Object.values(T));
+  const centro = w / 2, eje = 64, ancho = (w - eje) / 2 - 56;
+  const fila = (h - 8) / capas, alto = Math.min(26, fila - 4);
+  for (let c = 1; c <= 12; c++){
+    const visible = c <= capas;
+    const y = 4 + (c - 1) * fila + (fila - alto) / 2;
+    const a = A[c] || 0, t = T[c] || 0;
+    const wa = a ? Math.max(2, ancho * a / max) : 0, wt = t ? Math.max(2, ancho * t / max) : 0;
+    nodo(svg, 'text', {x: centro, y: y + alto / 2 + 4, 'text-anchor':'middle', 'font-weight':600, opacity: visible ? 1 : 0}, 'l' + c).textContent = `Capa ${c}`;
+    const ra = nodo(svg, 'rect', {class:'barra', x: centro - eje / 2 - wa, y, width: wa, height: alto, rx: 4, fill:'var(--antes)', opacity: visible ? 1 : 0}, 'a' + c);
+    ra.onmousemove = e => tip(e, `Hoy · capa ${c}: ${fmt(a)} personas`); ra.onmouseleave = untip;
+    nodo(svg, 'text', {x: centro - eje / 2 - wa - 6, y: y + alto / 2 + 4, 'text-anchor':'end', opacity: visible && a ? 1 : 0}, 'va' + c).textContent = fmt(a);
+    const rt = nodo(svg, 'rect', {class:'barra', x: centro + eje / 2, y, width: wt, height: alto, rx: 4, fill:'var(--despues)', opacity: visible && t ? 1 : 0}, 't' + c);
+    rt.onmousemove = e => tip(e, `Propuesta · capa ${c}: ${fmt(t)} personas`); rt.onmouseleave = untip;
+    nodo(svg, 'text', {x: centro + eje / 2 + wt + 6, y: y + alto / 2 + 4, opacity: visible && t ? 1 : 0, fill:'var(--text)'}, 'vt' + c).textContent = fmt(t);
+  }
+  if (!tobe) nodo(svg, 'text', {x: centro + eje / 2 + 12, y: h / 2, fill:'var(--text-3)'}, 'espera').textContent = 'La propuesta aparece cuando el optimizador diseñe las jefaturas';
+  else { const n = svg.querySelector('[data-k="espera"]'); if (n) n.remove(); }
+}
+
+function tramos(){
+  const cont = $('#tramos');
+  const asis = E.datos.asis, tobe = E.datos.tobe;
+  if (!asis){ cont.innerHTML = '<div class="vacio">Esperando el diagnóstico</div>'; return; }
+  const [svg, w, h] = svgEl(cont);
+  const A = asis.distribucion_tramos, T = tobe?.metricas.distribucion_tramos;
+  const max = Math.max(...A.map(r => r.jefes), ...(T || []).map(r => r.jefes));
+  const base = h - 22, top = 16, grupo = w / A.length, bw = Math.min(22, grupo / 2 - 6);
+  nodo(svg, 'line', {x1: 0, x2: w, y1: base, y2: base, stroke:'var(--border-2)'}, 'base');
+  A.forEach((r, i) => {
+    const x = i * grupo + grupo / 2;
+    const ha = (base - top) * r.jefes / max, ht = T ? (base - top) * T[i].jefes / max : 0;
+    const ba = nodo(svg, 'rect', {class:'barra', x: x - bw - 1, y: base - ha, width: bw, height: Math.max(ha, 0.5), rx: 3, fill:'var(--antes)'}, 'a' + i);
+    ba.style.transition = 'y .9s, height .9s';
+    ba.onmousemove = e => tip(e, `Hoy: ${r.jefes} jefes con ${r.tramo} reportes`); ba.onmouseleave = untip;
+    const bt = nodo(svg, 'rect', {class:'barra', x: x + 1, y: base - ht, width: bw, height: Math.max(ht, 0.5), rx: 3, fill:'var(--despues)', opacity: T ? 1 : 0}, 't' + i);
+    bt.style.transition = 'y .9s, height .9s';
+    bt.onmousemove = e => tip(e, `Propuesta: ${T ? T[i].jefes : 0} jefes con ${r.tramo} reportes`); bt.onmouseleave = untip;
+    nodo(svg, 'text', {x, y: h - 4, 'text-anchor':'middle'}, 'x' + i).textContent = r.tramo;
+    nodo(svg, 'text', {x: x - bw / 2 - 1, y: base - ha - 4, 'text-anchor':'middle', 'font-size':11}, 'va' + i).textContent = r.jefes || '';
+    nodo(svg, 'text', {x: x + bw / 2 + 1, y: base - ht - 4, 'text-anchor':'middle', 'font-size':11, fill:'var(--text)', opacity: T ? 1 : 0}, 'vt' + i).textContent = T && T[i].jefes ? T[i].jefes : '';
+  });
+}
+
+function modelo(){
+  const cont = $('#modelo');
+  const mod = E.datos.modelo, tobe = E.datos.tobe;
+  if (!mod){
+    $('#tituloModelo').textContent = 'Organización actual por área';
+    $('#subModelo').textContent = E.datos.capacidades ? `${E.datos.capacidades.duplicadas.length} capacidades duplicadas` : '';
+    if (!empresa) return;
+    const dup = E.datos.capacidades?.duplicadas || [];
+    const h0 = `<div class="banda"><div class="bloques">${empresa.areas.map(a => `<div class="bloque" style="--c:var(--antes)"><b>${esc(a.area)}</b><span><em>${fmt(a.personas)}</em> personas · ${a.jefaturas} jefaturas</span></div>`).join('')}</div></div>`
+      + (dup.length ? `<div class="banda"><div class="tit" style="color:var(--objecion)">Duplicadas entre unidades</div><div style="font-size:13px;color:var(--text-2)">${dup.map(esc).join(' · ')}</div></div>` : '');
+    if (cont.dataset.html !== h0){ cont.dataset.html = h0; cont.innerHTML = h0; }
+    return;
+  }
+  $('#tituloModelo').textContent = 'Modelo producto-plataforma';
+  const B = Object.fromEntries((tobe?.bloques || []).map(b => [b.nombre, b]));
+  $('#subModelo').textContent = tobe ? `${tobe.bloques.length} bloques reportan al CEO` : 'propuesto';
+  const banda = (titulo, color, lista, det) => `<div class="banda"><div class="tit" style="color:${color}"><i style="background:${color}"></i>${titulo}</div><div class="bloques">${lista.map(b => {
+    const x = B[b.nombre];
+    return `<div class="bloque" style="--c:${color}"><b>${esc(b.nombre)}</b><span>${x ? `<em>${fmt(x.personas)}</em> personas · ${x.capas} capas` : esc(det(b))}</span></div>`;
+  }).join('')}</div></div>`;
+  const html = banda('Productos', 'var(--producto)', mod.productos, b => b.categorias.join(', '))
+    + banda('Plataformas', 'var(--plataforma)', mod.plataformas, b => `${b.capacidades.length} capacidades`)
+    + banda('Habilitadores', 'var(--habilitador)', mod.habilitadores, b => '');
+  if (cont.dataset.html !== html){ cont.dataset.html = html; cont.innerHTML = html; }
+}
+
+function kpis(){
+  const a = E.datos.asis, t = E.datos.tobe?.metricas, imp = E.datos.impacto;
+  const filas = [
+    ['Capas', a?.capas, t?.capas, 'menos', ''],
+    ['Tramo promedio', a?.tramo_promedio, t?.tramo_promedio, 'mas', ''],
+    ['Jefaturas', a?.jefaturas, t?.jefaturas, 'menos', ''],
+    ['Jefes con 1 reporte', a?.jefes_un_reporte, t?.jefes_un_reporte, 'menos', ''],
+  ];
+  let html = filas.map(([lbl, x, y, dir]) => {
+    let delta = '';
+    if (x != null && y != null && x !== 0){ const d = (y - x) / x * 100; delta = `${d > 0 ? '+' : ''}${Math.round(d)}%`; }
+    return `<div class="kpi ${y == null ? 'pendiente' : ''}"><div class="lbl">${lbl}</div><div class="val"><span class="antes">${x != null ? fmt(x) : '—'}</span><span class="flecha">→</span><span class="desp">${y != null ? fmt(y) : '?'}</span>${delta ? `<span class="delta">${delta}</span>` : ''}</div></div>`;
+  }).join('');
+  html += `<div class="kpi ancho ${imp ? '' : 'pendiente'}"><div class="lbl">Ahorro anual estimado</div><div class="val"><span class="desp">${imp ? 'USD ' + fmt(imp.ahorro_anual_musd) + ' M' : '?'}</span>${imp ? `<span class="delta">${fmt(imp.ahorro_pct_costo_total)}% del costo de personal</span>` : ''}</div></div>`;
+  html += `<div class="kpi ancho ${imp ? '' : 'pendiente'}"><div class="lbl">Personas de las unidades de negocio a plataformas</div><div class="val"><span class="desp">${imp ? fmt(imp.personas_de_unidades_a_plataformas) : '?'}</span></div></div>`;
+  const k = $('#kpis'); if (k.dataset.html !== html){ k.dataset.html = html; k.innerHTML = html; }
+}
+
+function chro(){
+  const v = E.datos.veredicto, r = E.datos.riesgos, hist = E.datos.tobe_historial || [];
+  let html = '';
+  if (v){
+    const ok = v.veredicto === 'APROBADO';
+    html += `<div class="veredicto ${ok ? 'aprobado' : 'objetado'}">${ok ? '✓ APROBADO' : '✋ OBJETADO'}</div>`;
+    const cp = v.cambios_pedidos || [], ob = v.objeciones || [];
+    const items = ok ? cp.map(c => `<li class="ok">${esc(c)}</li>`) : ob.map(o => `<li>${esc(o)}</li>`);
+    html += `<ul>${items.join('')}</ul>`;
+    if (!ok && cp.length) html += `<div style="font-size:12px;color:var(--text-3)">Pide: ${esc(cp.join(' '))}</div>`;
+  } else if (r){
+    html += `<ul>${r.hallazgos.map(x => `<li>${esc(x.hallazgo)}</li>`).join('') || '<li class="ok">Sin riesgos en los chequeos</li>'}</ul>`;
+  } else {
+    html += `<div style="color:var(--text-3);font-size:13px">El CHRO revisa el diseño cuando el equipo termina. Puede objetarlo y obligar a una segunda ronda.</div>`;
+  }
+  if (hist.length){
+    html += `<div class="historial" style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border)"><span>Intentos del optimizador</span>${hist.map((x, i) => `<span>#${i + 1} · <b>${x.capas} capas</b> · ${fmt(x.jefaturas)} jefaturas · tramo ${fmt(x.tramo_promedio)}</span>`).join('')}</div>`;
+  }
+  const c = $('#chro'); if (c.dataset.html !== html){ c.dataset.html = html; c.innerHTML = html; }
+}
+
+const tipEl = $('#tip');
+function tip(e, txt){ tipEl.textContent = txt; tipEl.style.display = 'block'; tipEl.style.left = (e.clientX + 12) + 'px'; tipEl.style.top = (e.clientY + 12) + 'px'; }
+function untip(){ tipEl.style.display = 'none'; }
+
+setInterval(() => {
+  if (!E || !E.corrida.inicio) { $('#reloj').textContent = '0:00'; return; }
+  const fin = E.corrida.estado === 'corriendo' ? Date.now() / 1000 : (E.corrida.fin || Date.now() / 1000);
+  const s = Math.max(0, Math.round(fin - E.corrida.inicio));
+  $('#reloj').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}, 500);
+window.addEventListener('resize', render);
+
+// ------------------------------------------------------------------ conexión
+function conectar(){
+  const es = new EventSource('/api/eventos');
+  es.addEventListener('snapshot', e => { E = JSON.parse(e.data); render(); });
+  es.onmessage = e => { if (!E) return; aplicar(JSON.parse(e.data)); render(); };
+  es.onerror = () => { $('#fase').textContent = 'Reconectando…'; };
+}
+
+// ------------------------------------------------------------------ controles del presentador
+async function post(url){
+  const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN), {method:'POST'});
+  if (!r.ok){ const d = await r.json().catch(() => ({})); alert(d.detail || 'Error'); }
+}
+document.querySelectorAll('.controles button[data-modo]').forEach(b => b.onclick = () => post('/api/correr?modo=' + b.dataset.modo));
+$('#bReiniciar').onclick = () => post('/api/reiniciar');
+$('#bQR').onclick = () => {
+  const url = location.origin + '/';
+  $('#qrurl').textContent = url.replace(/^https?:\/\//, '');
+  const q = $('#qr'); q.style.display = 'grid'; q.onclick = () => q.style.display = 'none';
+  if (window.qrcode){ const c = qrcode(0, 'M'); c.addData(url); c.make(); $('#qrcode').innerHTML = c.createSvgTag({cellSize: 8, margin: 2}); }
+};
+
+(async () => {
+  empresa = await fetch('/api/empresa').then(r => r.json());
+  $('#empresa').textContent = `${empresa.nombre} · ${empresa.nota.toLowerCase()} · ${fmt(empresa.personas)} personas`;
+  if (TOKEN){
+    if (!empresa.vivo_disponible){ const b = $('#bVivo'); b.title = 'Falta ANTHROPIC_API_KEY en el servidor'; b.textContent = '▶ En vivo (sin clave)'; }
+    if (!empresa.grabacion_disponible) $('#bGrab').title = 'Aún no hay grabación: usará el guion';
+    const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'; document.head.appendChild(s);
+  }
+  if (!E){ E = estadoInicial(); }
+  render();
+  conectar();
+})();
+</script>
+</body>
+</html>

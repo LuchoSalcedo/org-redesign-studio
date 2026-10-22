@@ -49,20 +49,30 @@ PROMPTS = {
                  "Productos = equipos por categoría con marketing de marca, innovación y category management. "
                  "Plataformas = capacidades compartidas que sirven a todos los productos (supply, go-to-market, "
                  "datos y RGM, digital, etc.). Habilitadores = finanzas, gestión humana, tecnología, legal. "
-                 "Usa validar_modelo si dudas y termina SIEMPRE llamando a proponer_modelo con un modelo válido. "
+                 "Reglas de diseño: no pongas plantas (manufactura) y distribución (logística) en el mismo bloque; "
+                 "un bloque con más de 10 equipos obliga a una capa de dirección y suma una capa; el CEO no debe tener "
+                 "más de 12 reportes directos. Llama a proponer_modelo con un modelo válido: te devuelve una vista "
+                 "previa. Si la vista previa trae alertas, corrige y vuelve a proponer (máximo 2 veces). "
                  "Explica en 3 viñetas la lógica del diseño.",
     "optimizador": f"Eres el especialista en span & layers. {ESTILO} "
                    "Llama a disenar_organizacion con reglas de tramo por tipo de trabajo. Si el resultado trae "
                    "alertas (por ejemplo más de 7 capas), ajusta las reglas y vuelve a llamar (máximo 3 intentos). "
                    "Rangos razonables: operativo 12-15, comercial de campo 8-12, profesional 6-8, especialista 4-6, "
-                   "gerencial 5-8. Explica qué ajustaste y por qué.",
+                   "gerencial 5-8, tramo_lider_bloque 6-8 (más de 8 el CHRO lo objeta). Si las capas de más vienen de "
+                   "una capa de dirección en un bloque con muchos equipos, no fuerces los tramos: dilo claramente para "
+                   "que el diseñador divida el bloque. Explica qué ajustaste y por qué.",
     "impacto": f"Eres el analista de impacto. {ESTILO} Calcula el impacto con tu herramienta y resume: "
                "posiciones de jefatura, capas, tramo promedio, ahorro anual y consolidaciones hacia plataformas.",
     "chro": f"Eres el CHRO de la empresa: exigente, con experiencia en plantas y fuerza de ventas, y escéptico de "
-            f"los rediseños hechos en Excel. {ESTILO} Usa revisar_riesgos, agrega tu criterio y termina SIEMPRE "
-            "llamando a emitir_veredicto. Objeta (OBJETADO) si hay algún riesgo alto o dos medios relevantes; "
-            "pide cambios concretos y accionables. En una segunda revisión, aprueba si los riesgos altos se "
-            "resolvieron.",
+            f"los rediseños hechos en Excel. {ESTILO} Usa revisar_riesgos y agrega tu criterio. "
+            "Criterios de la empresa: hasta 12 reportes directos para el CEO es aceptable en un modelo "
+            "producto-plataforma; la diferencia entre personas de hoy y posiciones propuestas son jefaturas "
+            "eliminadas, no personas sin asignar. Objeta (OBJETADO) solo por problemas que el equipo puede corregir "
+            "ahora en el diseño: algún riesgo alto o dos medios relevantes. Lo que requiere datos de campo, "
+            "validaciones con líderes o planes de transición va como condición de implementación en "
+            "cambios_pedidos al aprobar. En una segunda revisión, aprueba si los riesgos altos se resolvieron. "
+            "Antes de emitir el veredicto, escribe tus objeciones o condiciones en viñetas; luego llama SIEMPRE a "
+            "emitir_veredicto.",
 }
 
 CAPS_NO_PRODUCTO = [c for c in motor.CAPACIDADES if c not in motor.CAPACIDADES_PRODUCTO]
@@ -157,7 +167,11 @@ class Sesion:
             await emit({"type": "data", "key": "modelo", "value": entrada})
             await emit({"type": "agent_tool", "agent": agente, "tool": nombre,
                         "summary": f'Propuso {len(entrada["productos"])} productos, {len(entrada["plataformas"])} plataformas y {len(entrada["habilitadores"])} habilitadores'})
-            return {"registrado": True}
+            previa = motor.disenar_org(entrada, None)  # vista previa con tramos estándar, para que el diseñador vea las consecuencias
+            return {"registrado": True, "vista_previa_con_tramos_estandar": {
+                "capas": previa["metricas"]["capas"], "reportes_del_ceo": previa["metricas"]["reportes_del_ceo"],
+                "alertas": previa["alertas"],
+                "bloques": [{k: b[k] for k in ("nombre", "tipo", "personas", "equipos", "capas")} for b in previa["bloques"]]}}
         if nombre == "disenar_organizacion":
             reglas = {k: v for k, v in entrada.items() if k not in ("justificacion", "capas_max")}
             r = motor.disenar_org(self.modelo or MODELO_RESPALDO, reglas)

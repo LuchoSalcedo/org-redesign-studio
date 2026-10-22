@@ -402,6 +402,20 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
         profundos = sorted({p["bloque"] for p in org if capa[p["id"]] > R["capas_max"]})
         alertas.append(f'El diseño tiene {m["capas"]} capas, más que el máximo de {R["capas_max"]}. '
                        f'Bloques con capas de más: {", ".join(profundos)}.')
+        for rb in resumen_bloques:
+            if rb["nombre"] in profundos and rb["equipos"] > R["tramo_lider_bloque"]:
+                alertas.append(f'{rb["nombre"]} tiene {rb["equipos"]} equipos: su líder necesita una capa de dirección '
+                               f'y eso agrega una capa. La forma de quitarla es dividir el bloque en dos '
+                               f'(por ejemplo, plantas por un lado y distribución por otro).')
+    ics = sum(1 for p in org if p["rol"] == "ic")
+    m["reportes_del_ceo"] = len(hijos[org[0]["id"]])
+    m["dotacion"] = {
+        "personas_hoy": len(cargar_asis()),
+        "contribuidores_individuales_conservados": ics,
+        "posiciones_de_jefatura_propuestas": m["jefaturas"],
+        "nota": "Todos los contribuidores individuales de hoy están en el diseño. La diferencia entre las personas "
+                "de hoy y las posiciones propuestas son jefaturas eliminadas; no hay personas sin asignar.",
+    }
     return {"ok": True, "reglas": R, "metricas": m, "bloques": resumen_bloques, "alertas": alertas, "_org": org}
 
 
@@ -431,7 +445,8 @@ def revisar_riesgos(diseno: dict) -> dict:
                                           f'para justificar un líder de bloque que reporte al CEO.'})
     if len(diseno["bloques"]) > 12:
         hallazgos.append({"severidad": "alta", "bloque": "CEO",
-                          "hallazgo": f'El CEO tendría {len(diseno["bloques"])} reportes directos.'})
+                          "hallazgo": f'El CEO tendría {len(diseno["bloques"])} reportes directos; el máximo razonable '
+                                      f'en un modelo producto-plataforma es 12.'})
     for t, s in R["tramo_primera_linea"].items():
         if t == "operativo" and s > 15:
             hallazgos.append({"severidad": "alta", "bloque": "Plantas",
@@ -446,7 +461,8 @@ def revisar_riesgos(diseno: dict) -> dict:
     if diseno["metricas"]["capas"] > R["capas_max"]:
         hallazgos.append({"severidad": "alta", "bloque": "Toda la organización",
                           "hallazgo": f'Quedan {diseno["metricas"]["capas"]} capas; el objetivo era {R["capas_max"]}.'})
-    return {"hallazgos": hallazgos, "aprobable": not any(h["severidad"] == "alta" for h in hallazgos)}
+    return {"hallazgos": hallazgos, "aprobable": not any(h["severidad"] == "alta" for h in hallazgos),
+            "reportes_del_ceo": len(diseno["bloques"]), "dotacion": diseno["metricas"].get("dotacion")}
 
 
 def impacto(diseno: dict) -> dict:

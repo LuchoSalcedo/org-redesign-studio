@@ -183,7 +183,12 @@ def mapa_capacidades() -> dict:
         filas.append({**r, "areas": sorted(r["areas"]), "categorias": sorted(r["categorias"]),
                       "duplicada": len(r["areas"]) > 1})
     filas.sort(key=lambda r: (-len(r["areas"]), -r["personas"]))
+    direccion = sum(1 for p in org if p["capacidad"] == "direccion")
     return {
+        "posiciones_de_direccion": direccion,
+        "nota_direccion": f"{direccion} posiciones de dirección (CEO, VPs, gerentes generales y comerciales) no tienen "
+                          f"capacidad asignada: se rediseñan como líderes de bloque. Con ellas se suman las "
+                          f"{len(org):,} personas.",
         "capacidades": filas,
         "duplicadas": [r["nombre"] for r in filas if r["duplicada"]],
         "capacidades_de_producto": sorted(CAPACIDADES_PRODUCTO),

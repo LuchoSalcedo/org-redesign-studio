@@ -221,24 +221,40 @@ class Sesion:
 
 
 # =========================================================================== modo en vivo
-async def _agente_vivo(cliente, sesion: Sesion, agente: str, mensaje: str, ronda: int = 1, max_turnos: int = 6) -> str:
+# Herramienta que cada agente DEBE llamar con éxito antes de terminar; si no lo hace, se le recuerda.
+OBLIGATORIA = {"diagnostico": "medir_span_and_layers", "capacidades": "mapear_capacidades",
+               "disenador": "proponer_modelo", "optimizador": "disenar_organizacion",
+               "impacto": "calcular_impacto", "chro": "emitir_veredicto"}
+
+
+async def _agente_vivo(cliente, sesion: Sesion, agente: str, mensaje: str, ronda: int = 1, max_turnos: int = 8) -> str:
     emit = sesion.bus.emit
     await emit({"type": "agent_status", "agent": agente, "status": "pensando", "ronda": ronda})
     mensajes = [{"role": "user", "content": mensaje}]
     texto_final = ""
+    cumplio, recordatorios = False, 0
     for _ in range(max_turnos):
         async with cliente.messages.stream(
-            model=MODELO_CHRO if agente == "chro" else MODELO, max_tokens=1600, system=PROMPTS[agente],
+            model=MODELO_CHRO if agente == "chro" else MODELO, max_tokens=8000, system=PROMPTS[agente],
             tools=HERRAMIENTAS[agente], messages=mensajes,
         ) as stream:
             async for delta in stream.text_stream:
                 await emit({"type": "agent_text", "agent": agente, "delta": delta})
                 texto_final += delta
             final = await stream.get_final_message()
-        mensajes.append({"role": "assistant", "content": final.content})
+        if final.content:
+            mensajes.append({"role": "assistant", "content": final.content})
         usos = [b for b in final.content if b.type == "tool_use"]
         if not usos:
-            break
+            if cumplio or recordatorios >= 2:
+                break
+            # terminó sin hacer su trabajo (respuesta vacía o cortada): se le pide que lo haga
+            recordatorios += 1
+            if not final.content:
+                mensajes.append({"role": "assistant", "content": "(sin respuesta)"})
+            mensajes.append({"role": "user", "content": f"Todavía no completas tu trabajo. Llama ahora a "
+                                                        f"{OBLIGATORIA[agente]} y después resume en viñetas."})
+            continue
         await emit({"type": "agent_status", "agent": agente, "status": "trabajando"})
         resultados = []
         for u in usos:
@@ -246,6 +262,9 @@ async def _agente_vivo(cliente, sesion: Sesion, agente: str, mensaje: str, ronda
                 res, err = await sesion.ejecutar(agente, u.name, u.input if isinstance(u.input, dict) else {}), False
             except Exception as e:  # noqa: BLE001 — un error de herramienta no debe tumbar la corrida
                 res, err = {"error": f"{type(e).__name__}: {e}. Revisa el formato y vuelve a intentar."}, True
+            if (u.name == OBLIGATORIA[agente] and not err and isinstance(res, dict)
+                    and not res.get("error") and res.get("registrado", True) and res.get("ok", True) is not False):
+                cumplio = True
             resultados.append({"type": "tool_result", "tool_use_id": u.id, "is_error": err,
                                "content": json.dumps(res, ensure_ascii=False, default=str)[:12000]})
         await emit({"type": "agent_text", "agent": agente, "delta": "\n"})

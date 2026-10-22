@@ -35,7 +35,8 @@ ESTILO = (
     "Escribes en español para 50 gerentes que leen tu texto proyectado en vivo. Frases cortas. "
     "Antes de usar una herramienta, di en una línea qué vas a hacer. Después de los resultados, da "
     "máximo 5 viñetas con números concretos. Nada de introducciones ni despedidas. Nunca inventes cifras: "
-    "usa solo las que devuelven las herramientas."
+    "usa solo las que devuelven las herramientas. Nunca comentes sobre las herramientas, las llamadas o el "
+    "sistema: si algo falla, corrígelo sin mencionarlo."
 )
 
 PROMPTS = {
@@ -204,9 +205,13 @@ class Sesion:
             return {**r, "bloques": [{k: b[k] for k in ("nombre", "tipo", "personas", "reportes_del_lider", "capas")} for b in self.diseno["bloques"]],
                     "reglas": self.diseno["reglas"]}
         if nombre == "emitir_veredicto":
+            lista = lambda v: [str(x) for x in v] if isinstance(v, list) else ([str(v)] if v else [])
             entrada = {"veredicto": "APROBADO" if entrada.get("veredicto") == "APROBADO" else "OBJETADO",
-                       "objeciones": [str(x) for x in entrada.get("objeciones") or []],
-                       "cambios_pedidos": [str(x) for x in entrada.get("cambios_pedidos") or []]}
+                       "objeciones": lista(entrada.get("objeciones")),
+                       "cambios_pedidos": lista(entrada.get("cambios_pedidos"))}
+            if entrada["veredicto"] == "OBJETADO" and not entrada["objeciones"]:
+                return {"error": "Un veredicto OBJETADO necesita al menos una objeción en 'objeciones'. "
+                                 "Vuelve a llamar con las objeciones y los cambios pedidos."}
             self.veredicto = entrada
             await emit({"type": "data", "key": "veredicto", "value": entrada})
             await emit({"type": "agent_tool", "agent": agente, "tool": nombre,

@@ -13,8 +13,8 @@ trabajan los agentes. Se usa en demos en vivo frente a audiencias de negocio:
 | `app/motor.py` | Toda la aritmética: diagnóstico, mapa de capacidades, validación del modelo, diseño del organigrama desde la base (`disenar_org`), riesgos del CHRO (`revisar_riesgos`), impacto. Determinístico. |
 | `app/agentes.py` | Prompts, herramientas y orquestación de los 6 agentes. Modos: `vivo` (API de Claude), `guion` (plan B sin IA, textos pre-escritos con números reales) y `grabacion` (repite la última corrida en vivo de `runs/`). |
 | `app/bus.py` | Eventos y estado de la corrida. `aplicar()` es el reducer; `static/index.html` tiene un espejo en JS (`aplicar`) que debe mantenerse igual. |
-| `static/index.html` | Interfaz completa en un solo archivo (HTML + CSS + JS, sin build, sin dependencias). Dibuja con SVG a mano. |
-| `app/main.py` | FastAPI: `/` interfaz, `/api/eventos` SSE, `/api/correr?modo=…&token=…`, `/api/reiniciar`, `/api/descargar/{actual|propuesta}.csv`. |
+| `static/index.html` | Interfaz completa en un solo archivo (HTML + CSS + JS, sin build, sin dependencias). Dibuja con SVG a mano. Tres vistas: Organización actual, Rediseño con agentes y Cómo funciona (con el popup de configuración de cada agente). |
+| `app/main.py` | FastAPI: `/` interfaz, `/api/eventos` SSE, `/api/organizacion` (vista previa a la corrida), `/api/agentes` (configuración visible de cada agente), `/api/correr?modo=…&token=…`, `/api/reiniciar`, `/api/descargar/{actual|propuesta}.csv`. |
 | `app/generar_org.py` | Genera la organización sintética (semilla fija). |
 
 Flujo de una corrida: Diagnóstico + Capacidades (en paralelo) → Diseñador → Optimizador → Impacto → CHRO.
@@ -26,6 +26,10 @@ Los datos que ve la interfaz llegan como eventos `{"type":"data","key":…}` con
 `jefaturas`, `equipos`, `reportes_del_lider`, `capas`, `costo_musd`.
 
 ## Reglas para cambios
+
+- **Diseño visual: sistema RGMx.** Usa solo las variables CSS de `:root` en `index.html` (nada de hex sueltos),
+  botones en MAYÚSCULAS con un solo primario por zona, cada KPI con delta y referencia, y deltas en verde o rojo
+  según si el cambio es bueno para ese KPI (menos capas o jefaturas = verde).
 
 - Los números los calcula `motor.py`, nunca los agentes ni la interfaz.
 - Textos visibles en español, frases cortas.

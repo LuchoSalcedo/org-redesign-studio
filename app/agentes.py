@@ -529,3 +529,86 @@ async def correr_grabacion(bus: Bus) -> None:
         if ev["type"] == "run_start":
             ev["modo"] = "grabacion"
         await bus.emit(ev)
+
+
+# =========================================================================== "Cómo funciona": configuración visible
+DETALLE = {
+    "diagnostico": {"fase": "Ronda 1 · en paralelo con Capacidades",
+                    "recibe": "El brief del CEO (caso) y la instrucción de diagnosticar span & layers.",
+                    "publica": ["Pirámide y KPIs de hoy (asis)"],
+                    "calcula_el_codigo": "Capas, tramos, jefes con un reporte y costo de jefaturas sobre las 3,744 posiciones."},
+    "capacidades": {"fase": "Ronda 1 · en paralelo con Diagnóstico",
+                    "recibe": "El brief del CEO y la instrucción de mapear capacidades.",
+                    "publica": ["Capacidades duplicadas (capacidades)"],
+                    "calcula_el_codigo": "Cuántas personas tiene cada capacidad y en cuántas áreas vive."},
+    "disenador": {"fase": "Ronda 1 y ronda 2",
+                  "recibe": "El brief, el texto del Diagnóstico y del Mapa de capacidades. En la ronda 2, además, "
+                            "el modelo anterior y las objeciones del CHRO.",
+                  "publica": ["Modelo producto-plataforma (modelo)"],
+                  "calcula_el_codigo": "Valida que cada capacidad y categoría quede en un solo bloque y devuelve una "
+                                       "vista previa con capas y alertas."},
+    "optimizador": {"fase": "Ronda 1 y ronda 2",
+                    "recibe": "El brief y el modelo registrado. En la ronda 2, además, las reglas anteriores y las "
+                              "objeciones del CHRO.",
+                    "publica": ["Organigrama propuesto (tobe)", "Intentos del optimizador"],
+                    "calcula_el_codigo": "Construye el organigrama desde la base: agrupa a los contribuidores en "
+                                         "equipos y crea las jefaturas según los tramos elegidos."},
+    "impacto": {"fase": "Ronda 1 y ronda 2",
+                "recibe": "El brief y la instrucción de resumir el impacto del diseño vigente.",
+                "publica": ["KPIs antes → después y ahorro (impacto)"],
+                "calcula_el_codigo": "Compara hoy contra la propuesta: jefaturas, capas, tramo, costo y personas "
+                                     "que pasan de las unidades a plataformas."},
+    "chro": {"fase": "Cierre de cada ronda",
+             "recibe": "El brief y, en la segunda revisión, sus propias objeciones anteriores.",
+             "publica": ["Riesgos detectados (riesgos)", "Veredicto: APROBADO u OBJETADO (veredicto)"],
+             "calcula_el_codigo": "Chequeos de riesgo: reportes por líder, tramos de planta y ventas, tamaño de "
+                                  "bloques, capas y reportes del CEO."},
+}
+
+
+TIPOS_ES = {"object": "objeto", "integer": "entero", "string": "texto", "array": "lista", "number": "número"}
+PARAM_DESC = {
+    "productos": "Equipos de producto: nombre y categorías que cubre cada uno.",
+    "plataformas": "Capacidades compartidas que sirven a todos los productos.",
+    "habilitadores": "Funciones de soporte: finanzas, gente, tecnología, legal.",
+    "tramo_primera_linea": "Reportes por supervisor según el tipo de trabajo: operativo, comercial de campo, "
+                           "profesional y especialista.",
+    "tramo_gerencial": "Reportes de un jefe de jefes.",
+    "tramo_lider_bloque": "Reportes del líder de cada bloque antes de crear una capa de dirección.",
+    "justificacion": "Por qué eligió esas reglas.",
+    "veredicto": "APROBADO u OBJETADO.",
+    "objeciones": "Problemas que el equipo debe corregir.",
+    "cambios_pedidos": "Cambios concretos o condiciones de implementación.",
+}
+
+
+def _parametros(esquema: dict) -> list[dict]:
+    props = (esquema or {}).get("properties", {})
+    req = set((esquema or {}).get("required", []))
+    out = []
+    for nombre, p in props.items():
+        tipo = TIPOS_ES.get(p.get("type", ""), p.get("type", ""))
+        items = p.get("items") if isinstance(p.get("items"), dict) else {}
+        if p.get("type") == "array":
+            tipo = f'lista de {TIPOS_ES.get(items.get("type", "object"), "objetos")}'
+        out.append({"nombre": nombre, "tipo": tipo, "requerido": nombre in req,
+                    "opciones": p.get("enum") or items.get("enum"),
+                    "descripcion": PARAM_DESC.get(nombre, p.get("description", ""))})
+    return out
+
+
+def configuracion_agentes() -> dict:
+    from app.bus import AGENTES
+    agentes = []
+    for a in AGENTES:
+        i = a["id"]
+        agentes.append({
+            **a, **DETALLE[i],
+            "modelo": MODELO_CHRO if i == "chro" else MODELO,
+            "instrucciones": PROMPTS[i],
+            "herramienta_obligatoria": OBLIGATORIA[i],
+            "herramientas": [{"nombre": h["name"], "descripcion": h["description"],
+                              "parametros": _parametros(h["input_schema"])} for h in HERRAMIENTAS[i]],
+        })
+    return {"caso": CASO, "estilo_comun": ESTILO, "agentes": agentes,
+            "reglas_por_defecto": motor.REGLAS_POR_DEFECTO}

@@ -4,182 +4,556 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Org Redesign Studio</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%233987e5%27/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%274%27 fill=%27%230A1B45%27/%3E%3Cpath d=%27M4 11V6M8 11V4M12 11V8%27 stroke=%27white%27 stroke-width=%271.6%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
+/* ===================================================================== RGMx tokens (design system) */
 :root{
-  color-scheme: dark;
-  --bg:#0e1014; --surface:#161920; --surface-2:#1d212a; --border:#2a2f3a; --border-2:#384050;
-  --text:#eceae4; --text-2:#b9b7ae; --text-3:#8d8b83;
-  --antes:#7d7b74; --despues:#3987e5;
-  --pensando:#3987e5; --trabajando:#e0a020; --listo:#2fbf87; --error:#e66767; --objecion:#e8833a;
-  --producto:#3987e5; --plataforma:#9085e9; --habilitador:#7d7b74;
-  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+  --prizm-primary-10:#0A1B45; --prizm-primary-20:#13296A; --prizm-primary-30:#1E3A8F; --prizm-primary-40:#2B4FB3;
+  --prizm-primary-50:#4A6CC9; --prizm-primary-60:#6E8AD6; --prizm-primary-70:#97ABE3; --prizm-primary-80:#BFCCEE;
+  --prizm-primary-90:#E0E7FF; --prizm-primary-95:#EEF2FF; --prizm-primary-99:#F8FAFF;
+  --prizm-neutral-60:#919196; --prizm-neutral-70:#ABABB0; --prizm-neutral-80:#C7C6CB; --prizm-neutral-90:#E3E4EA;
+  --prizm-neutral-95:#F1F2F6;
+  --prizm-neutral-variant-10:#1B1B1E; --prizm-neutral-variant-30:#454752; --prizm-neutral-variant-40:#5F6270;
+  --prizm-surface-0:#FFFFFF; --prizm-surface-1:#F5F7FA; --prizm-surface-2:#EDF0F5; --prizm-scrim:rgba(10,27,69,.45);
+  --rgmx-success-fg:#067647; --rgmx-success-bg:#ECFDF3; --rgmx-success-strong:#29AE67;
+  --rgmx-live-fg:#177148; --rgmx-live-bg:#EAFAF1; --rgmx-live-border:#BFE8D2;
+  --rgmx-warning-fg:#9A6300; --rgmx-warning-bg:#FFF5E0; --rgmx-warning-border:#F2C57C; --rgmx-warning-strong:#F5B83D;
+  --rgmx-danger-fg:#9A1D1F; --rgmx-danger-bg:#FEE7E7; --rgmx-danger-text:#B42121; --rgmx-danger-strong:#E43A3C;
+  --rgmx-info-fg:#1E40AF; --rgmx-info-bg:#E7F0FE; --rgmx-info-border:#B6CCFB;
+  --rgmx-tl-green:#29AE67; --rgmx-tl-yellow:#F5B83D; --rgmx-tl-red:#EC7577;
+  --rgmx-series-1:#2B4FB3; --rgmx-series-2:#14B8A6; --rgmx-series-3:#F59E0B; --rgmx-series-4:#9333EA;
+  --rgmx-series-5:#DB2777; --rgmx-series-6:#64748B;
+  --rgmx-font-sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --rgmx-font-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,monospace;
+  --radius-sm:4px; --radius-md:6px; --radius-lg:8px; --radius-xl:12px; --radius-2xl:16px; --radius-full:9999px;
+  --elevation-1:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+  --elevation-2:0 4px 8px -2px rgba(16,24,40,.10),0 2px 4px -2px rgba(16,24,40,.06);
+  --elevation-3:0 12px 32px -4px rgba(16,24,40,.18),0 4px 8px -4px rgba(16,24,40,.06);
+  --focus-ring:0 0 0 2px var(--prizm-surface-0),0 0 0 4px var(--prizm-primary-70);
+  --motion-fast:120ms; --motion-base:180ms; --motion-slow:280ms; --ease:cubic-bezier(.2,0,0,1);
+
+  /* Roles de esta app (todos derivados de tokens) */
+  --grp-supply:var(--rgmx-series-1); --grp-ventas:var(--rgmx-series-2); --grp-bu:var(--rgmx-series-3); --grp-corp:var(--rgmx-series-4);
+  --ag-diagnostico:var(--rgmx-series-1); --ag-capacidades:var(--rgmx-series-2); --ag-disenador:var(--rgmx-series-4);
+  --ag-optimizador:var(--rgmx-series-3); --ag-impacto:var(--rgmx-series-6); --ag-chro:var(--rgmx-series-5);
+  --blk-producto:var(--rgmx-series-2); --blk-plataforma:var(--prizm-primary-40); --blk-habilitador:var(--rgmx-series-6);
+  --hoy:var(--prizm-neutral-80); --propuesta:var(--prizm-primary-40);
 }
+
+/* ===================================================================== Base */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;overflow:hidden}
-.app{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
-header{display:flex;align-items:center;gap:20px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
-.brand{display:flex;flex-direction:column;min-width:0}
-.brand b{font-size:18px;letter-spacing:.2px}
-.brand span{font-size:13px;color:var(--text-3)}
-.fase{flex:1;display:flex;align-items:center;gap:10px;min-width:260px}
-.fase .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border-2);font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.fase .pill .dot{width:8px;height:8px;border-radius:50%;background:var(--text-3);flex:none}
-.corriendo .fase .pill .dot{background:var(--pensando);animation:pulso 1.2s infinite}
-.reloj{font:600 20px var(--mono);color:var(--text-2);min-width:70px;text-align:right}
-.controles{display:none;gap:8px}
-.admin .controles{display:flex}
-.controles button{background:var(--surface-2);color:var(--text);border:1px solid var(--border-2);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer}
-.controles button.primario{background:var(--despues);border-color:var(--despues);color:#fff}
-.controles button:disabled{opacity:.4;cursor:default}
-main{display:grid;grid-template-columns:minmax(330px,22vw) 1fr minmax(300px,20vw);gap:14px;padding:14px;min-height:0}
-.col{display:flex;flex-direction:column;gap:12px;min-height:0}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;min-height:0}
-.panel h2{font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.panel h2 small{text-transform:none;letter-spacing:0;font-weight:500}
-/* agentes */
-#agentes{display:flex;flex-direction:column;gap:8px;overflow:auto;min-height:0;flex:1}
-.agente{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;transition:border-color .3s, box-shadow .3s;flex:1 1 0;min-height:86px}
-.agente.activo{border-color:var(--pensando);box-shadow:0 0 0 1px var(--pensando) inset}
-.agente.trabajando{border-color:var(--trabajando);box-shadow:0 0 0 1px var(--trabajando) inset}
-.agente .cab{display:flex;align-items:center;gap:8px}
-.agente .ico{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:var(--surface-2);font-size:13px;font-weight:700;color:var(--text-2);flex:none}
-.agente .nom{font-weight:700;font-size:15px;line-height:1.2}
-.agente .rol{font-size:12px;color:var(--text-3)}
-.agente .est{margin-left:auto;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;white-space:nowrap;color:var(--text-3)}
-.agente .est i{width:8px;height:8px;border-radius:50%;background:var(--text-3)}
-.agente[data-estado="pensando"] .est{color:var(--pensando)} .agente[data-estado="pensando"] .est i{background:var(--pensando);animation:pulso 1s infinite}
-.agente[data-estado="trabajando"] .est{color:var(--trabajando)} .agente[data-estado="trabajando"] .est i{background:var(--trabajando);animation:pulso .6s infinite}
-.agente[data-estado="listo"] .est{color:var(--listo)} .agente[data-estado="listo"] .est i{background:var(--listo)}
-.agente .txt{-webkit-mask-image:linear-gradient(transparent,#000 14px);mask-image:linear-gradient(transparent,#000 14px);padding-top:4px;font-size:13px;line-height:1.45;color:var(--text-2);white-space:pre-wrap;overflow:auto;flex:1;min-height:0;scrollbar-width:thin}
-.agente .txt:empty::before{content:"En espera";color:var(--text-3);font-style:italic}
-.agente .tool{font:12px var(--mono);color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.agente .tool b{color:var(--trabajando);font-weight:600}
+body{background:var(--prizm-surface-1);color:var(--prizm-neutral-variant-10);font:400 14px/20px var(--rgmx-font-sans);-webkit-font-smoothing:antialiased}
+button{font-family:inherit}
+.ico{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ico.sm{width:16px;height:16px}.ico.xs{width:14px;height:14px}
+.tabular{font-variant-numeric:tabular-nums}
+.muted{color:var(--prizm-neutral-variant-40)}
+.overline{font:600 11px/16px var(--rgmx-font-sans);letter-spacing:1.6px;text-transform:uppercase;color:var(--prizm-neutral-variant-40)}
+.overline.blue{color:var(--prizm-primary-40)}
+.headline-md{font:600 28px/36px var(--rgmx-font-sans);letter-spacing:-.3px}
+.title-lg{font:600 20px/28px var(--rgmx-font-sans)}.title-md{font:600 16px/24px var(--rgmx-font-sans)}.title-sm{font:600 14px/20px var(--rgmx-font-sans)}
+.body-sm{font:400 13px/18px var(--rgmx-font-sans)}.caption{font:400 12px/16px var(--rgmx-font-sans);color:var(--prizm-neutral-variant-40)}
+.mono{font-family:var(--rgmx-font-mono);font-size:12px}
+:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* ===================================================================== Componentes RGMx */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 16px;border-radius:var(--radius-sm);border:1px solid transparent;font:600 13px/16px var(--rgmx-font-sans);letter-spacing:.6px;text-transform:uppercase;cursor:pointer;background:none;white-space:nowrap;transition:background var(--motion-fast) var(--ease)}
+.btn.sm{height:32px;padding:0 12px}
+.btn-primary{background:var(--prizm-primary-40);color:#fff;box-shadow:var(--elevation-1)}.btn-primary:hover{background:var(--prizm-primary-30)}
+.btn-tonal{background:var(--prizm-primary-95);color:var(--prizm-primary-40)}.btn-tonal:hover{background:var(--prizm-primary-90)}
+.btn-outlined{border-color:var(--prizm-primary-40);color:var(--prizm-primary-40);background:#fff}.btn-outlined:hover{background:var(--prizm-primary-95)}
+.btn-text{color:var(--prizm-primary-40)}.btn-text:hover{background:var(--prizm-primary-95)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none}
+.icon-btn{display:grid;place-items:center;width:32px;height:32px;border-radius:var(--radius-sm);border:0;background:none;color:var(--prizm-neutral-variant-40);cursor:pointer}
+.icon-btn:hover{background:var(--prizm-primary-95);color:var(--prizm-primary-40)}
+.badge{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 8px;border-radius:var(--radius-full);font:600 10px/12px var(--rgmx-font-sans);letter-spacing:.4px;text-transform:uppercase;border:1px solid transparent;white-space:nowrap}
+.b-live{background:var(--rgmx-live-bg);color:var(--rgmx-live-fg);border-color:var(--rgmx-live-border)}
+.b-draft{background:var(--prizm-neutral-95);color:var(--prizm-neutral-variant-40);border-color:var(--prizm-neutral-90)}
+.b-pending{background:var(--rgmx-warning-bg);color:var(--rgmx-warning-fg);border-color:var(--rgmx-warning-border)}
+.b-ok{background:var(--rgmx-success-bg);color:var(--rgmx-success-fg)}
+.b-high{background:var(--rgmx-danger-bg);color:var(--rgmx-danger-fg)}
+.b-med{background:var(--rgmx-warning-bg);color:var(--rgmx-warning-fg)}
+.b-info{background:var(--rgmx-info-bg);color:var(--rgmx-info-fg);border-color:var(--rgmx-info-border)}
+.b-por{background:var(--prizm-primary-40);color:#fff}
+.b-period{background:var(--prizm-surface-2);color:var(--prizm-neutral-variant-40)}
+.badge .pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulso 1.1s infinite}
 @keyframes pulso{0%,100%{opacity:1}50%{opacity:.25}}
-/* centro */
-.centro{display:grid;grid-template-rows:minmax(0,1.15fr) minmax(0,1fr);gap:12px;min-height:0}
-.abajo{display:grid;grid-template-columns:1.55fr 1fr;gap:12px;min-height:0}
-.leyenda{display:flex;gap:14px;font-size:12px;color:var(--text-2);text-transform:none;letter-spacing:0;font-weight:500}
-.leyenda span{display:inline-flex;align-items:center;gap:6px}
-.leyenda i{width:12px;height:12px;border-radius:3px;display:inline-block}
-svg text{fill:var(--text-2);font-size:12px}
-.vacio{height:100%;display:grid;place-items:center;color:var(--text-3);font-size:14px;text-align:center;padding:20px}
-#piramide,#tramos,#modelo{height:calc(100% - 28px);position:relative}
-.barra{transition:width .9s cubic-bezier(.3,.7,.2,1), x .9s cubic-bezier(.3,.7,.2,1)}
-/* modelo */
-#modelo{display:flex;flex-direction:column;gap:8px;overflow:auto}
-.banda{display:flex;flex-direction:column;gap:5px}
-.banda .tit{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
-.banda .tit i{width:10px;height:10px;border-radius:3px}
-.bloques{display:grid;gap:6px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
-.bloque{background:var(--surface-2);border:1px solid var(--border);border-left:4px solid var(--c);border-radius:8px;padding:7px 9px;animation:entra .5s ease both}
-.bloque b{display:block;font-size:13px;line-height:1.25}
-.bloque span{display:block;font-size:12px;color:var(--text-3);margin-top:2px}
-.bloque em{font-style:normal;color:var(--text);font-weight:600}
-@keyframes entra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-/* kpis */
-.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
-.kpi.ancho{grid-column:span 2}
-.kpi .lbl{font-size:12px;color:var(--text-3);font-weight:600}
-.kpi .val{display:flex;align-items:baseline;gap:8px;margin-top:4px;flex-wrap:wrap}
-.kpi .antes{font:600 18px var(--mono);color:var(--antes)}
-.kpi .flecha{color:var(--text-3);font-size:14px}
-.kpi .desp{font:700 26px var(--mono);color:var(--text)}
-.kpi .delta{font-size:12px;font-weight:700;color:var(--listo)}
-.kpi.pendiente .desp{color:var(--text-3)}
-#chro{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}
-.veredicto{display:inline-flex;align-items:center;gap:8px;font-weight:800;font-size:16px;letter-spacing:.5px;padding:6px 12px;border-radius:8px;align-self:flex-start}
-.veredicto.objetado{background:rgba(232,131,58,.15);color:var(--objecion);border:1px solid var(--objecion)}
-.veredicto.aprobado{background:rgba(47,191,135,.12);color:var(--listo);border:1px solid var(--listo)}
-#chro ul{list-style:none;display:flex;flex-direction:column;gap:6px}
-#chro li{font-size:13px;color:var(--text-2);padding-left:14px;position:relative}
-#chro li::before{content:"";position:absolute;left:0;top:7px;width:6px;height:6px;border-radius:50%;background:var(--objecion)}
-#chro li.ok::before{background:var(--listo)}
-.historial{font:12px var(--mono);color:var(--text-3);display:flex;flex-direction:column;gap:2px}
-.historial b{color:var(--text-2)}
-footer{display:flex;align-items:center;gap:12px;padding:8px 20px;border-top:1px solid var(--border);background:var(--surface);font-size:13px;color:var(--text-2);white-space:nowrap;overflow:hidden}
-footer .lbl{color:var(--text-3);font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.6px}
-footer #ticker{overflow:hidden;text-overflow:ellipsis}
-footer a{color:var(--text-3);margin-left:auto}
-#tip{position:fixed;pointer-events:none;background:#000c;border:1px solid var(--border-2);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--text);display:none;z-index:10;max-width:280px}
-#qr{position:fixed;inset:0;background:#000d;display:none;place-items:center;z-index:20}
-#qr .caja{background:#fff;color:#111;border-radius:16px;padding:28px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
-#qr .caja b{font-size:22px}#qr .caja span{font:16px var(--mono)}
-/* pantallas medianas (laptop o proyector escalado) */
-@media (max-width: 1500px) and (min-width: 901px){
-  main{grid-template-columns:minmax(250px,21vw) minmax(0,1fr) minmax(230px,19vw);gap:10px;padding:10px}
-  .controles button{padding:6px 8px;font-size:12px}
-  .brand span{display:none}
-  .panel h2 small{display:none}
-  .agente .rol{display:none}
-  .agente{min-height:112px;flex:0 0 auto}
-  .agente .txt{max-height:72px}
+.delta{display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 7px;border-radius:var(--radius-full);font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.delta.good{background:var(--rgmx-success-bg);color:var(--rgmx-success-fg)}
+.delta.bad{background:var(--rgmx-danger-bg);color:var(--rgmx-danger-text)}
+.delta.flat{background:var(--prizm-neutral-90);color:var(--prizm-neutral-variant-40)}
+.pill-sum{display:inline-flex;height:24px;align-items:center;padding:0 10px;border-radius:var(--radius-md);background:var(--prizm-primary-95);color:var(--prizm-primary-40);font-size:11px;font-weight:600}
+.card{background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl)}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:8px 16px;padding:16px 20px 0;flex-wrap:wrap}
+.card-b{padding:12px 20px 20px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--prizm-neutral-variant-30)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.avatar{display:grid;place-items:center;border-radius:50%;color:#fff;font-weight:600;flex:none}
+.av-32{width:32px;height:32px;font-size:12px}.av-40{width:40px;height:40px;font-size:14px}
+.signal{display:flex;gap:12px;padding:14px 16px;border:1px solid var(--prizm-neutral-90);border-radius:10px;background:#fff}
+.signal .ic{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;flex:none}
+.signal.warn .ic{background:var(--rgmx-warning-bg);color:var(--rgmx-warning-fg)}
+.signal.bad .ic{background:var(--rgmx-danger-bg);color:var(--rgmx-danger-text)}
+.signal.ok .ic{background:var(--rgmx-success-bg);color:var(--rgmx-success-fg)}
+.signal.info .ic{background:var(--rgmx-info-bg);color:var(--rgmx-info-fg)}
+.note{background:var(--prizm-primary-95);border-radius:var(--radius-lg);padding:12px 16px;font-size:13px;line-height:18px}
+.note b{color:var(--prizm-primary-40)}
+table.dt{width:100%;border-collapse:collapse;background:#fff}
+.dt th{font:600 11px/16px var(--rgmx-font-sans);letter-spacing:1.2px;text-transform:uppercase;color:var(--prizm-neutral-variant-40);text-align:right;padding:10px 14px;border-bottom:1px solid var(--prizm-neutral-90);white-space:nowrap}
+.dt th:first-child,.dt td:first-child{text-align:left}
+.dt td{padding:0 14px;height:44px;border-bottom:1px solid var(--prizm-neutral-90);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dt tr:last-child td{border-bottom:0}
+.dt tbody tr:hover td{background:var(--prizm-primary-99)}
+.minibar{display:inline-block;width:90px;height:6px;border-radius:var(--radius-full);background:var(--prizm-neutral-95);vertical-align:middle;margin-right:10px;overflow:hidden}
+.minibar i{display:block;height:100%;border-radius:var(--radius-full)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
+
+/* ===================================================================== Shell */
+.app{display:grid;grid-template-columns:64px minmax(0,1fr);height:100vh}
+.rail{background:var(--prizm-primary-10);display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 0;color:#C9D3F0}
+.rail .tenant{display:grid;place-items:center;width:36px;height:36px;border-radius:var(--radius-lg);background:rgba(255,255,255,.12);color:#fff;font-weight:700;font-size:13px;margin-bottom:12px}
+.rail .it{display:grid;place-items:center;width:44px;height:44px;border-radius:10px;border:0;background:none;color:inherit;cursor:pointer;position:relative}
+.rail .it:hover{background:rgba(255,255,255,.08)}
+.rail .it.on{background:#fff;color:var(--prizm-primary-40)}
+.rail .it .dotlive{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--rgmx-success-strong);border:1.5px solid var(--prizm-primary-10);display:none}
+.running .rail .it .dotlive{display:block;animation:pulso 1.1s infinite}
+.rail .sp{flex:1}
+.main{display:grid;grid-template-rows:56px auto minmax(0,1fr) 40px;grid-template-columns:minmax(0,1fr);min-width:0;min-height:0}
+.topbar{display:flex;align-items:center;gap:12px;height:56px;padding:0 20px;background:#fff;border-bottom:1px solid var(--prizm-neutral-90);min-width:0}
+.crumb{display:flex;align-items:center;gap:8px;font-size:15px;white-space:nowrap;min-width:0;overflow:hidden}
+.crumb a{color:var(--prizm-primary-40);cursor:pointer}.crumb b{font-weight:600}.crumb .sep{color:var(--prizm-neutral-60)}
+.topbar .sp{flex:1}
+.runstate{display:flex;align-items:center;gap:10px;min-width:0}
+#runBadge{max-width:420px;overflow:hidden;text-overflow:ellipsis;display:inline-flex}
+.clock{font:600 15px/20px var(--rgmx-font-mono);color:var(--prizm-neutral-variant-30);min-width:44px;text-align:right}
+.toolbar{display:flex;align-items:center;gap:8px;padding:0 20px;background:#fff;border-bottom:1px solid var(--prizm-neutral-90);min-height:52px}
+.tabs{display:flex;gap:28px;align-self:stretch;overflow-x:auto;scrollbar-width:none;min-width:0}
+.tab{display:flex;align-items:center;gap:8px;padding:0 2px;font-size:15px;color:var(--prizm-neutral-variant-30);border:0;border-bottom:2px solid transparent;background:none;cursor:pointer;white-space:nowrap}
+.tab .n{display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--prizm-neutral-95);font-size:11px;font-weight:600;color:var(--prizm-neutral-variant-40)}
+.tab.on{color:var(--prizm-primary-40);border-color:var(--prizm-primary-40);font-weight:500}
+.tab.on .n{background:var(--prizm-primary-40);color:#fff}
+.toolbar .sp{flex:1}
+.acciones{display:none;gap:8px;align-items:center}
+.admin .acciones{display:flex}
+.content{overflow:auto;min-height:0}
+.view{display:none;padding:24px 28px 40px;max-width:1680px;margin:0 auto}
+.view.on{display:block}
+.statusbar{display:flex;align-items:center;gap:12px;height:40px;padding:0 20px;border-top:1px solid var(--prizm-neutral-90);font-size:12px;color:var(--prizm-neutral-variant-30);background:#fff;white-space:nowrap;overflow:hidden}
+.statusbar .lbl{font:600 10px/12px var(--rgmx-font-sans);letter-spacing:1.2px;text-transform:uppercase;color:var(--prizm-neutral-variant-40)}
+.statusbar #ticker{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.statusbar .sp{flex:1}
+.statusbar a{color:var(--prizm-primary-40);text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+
+/* ===================================================================== Encabezado de página */
+.page-h{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px;flex-wrap:wrap}
+.page-h p{margin-top:4px;color:var(--prizm-neutral-variant-40);max-width:760px}
+.page-h .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ===================================================================== KPI strip */
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:16px}
+.kpis.k5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.kpi{padding:16px 18px;border-left:1px solid var(--prizm-neutral-90);display:flex;flex-direction:column;gap:4px;min-width:0}
+.kpi:first-child{border-left:0}
+.kpi .v{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.kpi .num{font:500 30px/38px var(--rgmx-font-sans);font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.kpi .from{font:500 16px/20px var(--rgmx-font-sans);color:var(--prizm-neutral-variant-40);font-variant-numeric:tabular-nums}
+.kpi .arrow{color:var(--prizm-neutral-60)}
+.kpi.pend .num{color:var(--prizm-neutral-80)}
+.kpi .caption{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ===================================================================== Grillas */
+.g{display:grid;gap:16px;margin-bottom:16px}
+.g-2{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.g-2e{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.chart{position:relative;width:100%}
+.chart svg{display:block;width:100%;height:100%}
+.chart text{font-family:var(--rgmx-font-sans);font-size:12px;fill:var(--prizm-neutral-variant-40)}
+.chart text.v{fill:var(--prizm-neutral-variant-10);font-weight:600}
+.trans{transition:width .9s var(--ease),x .9s var(--ease),y .9s var(--ease),height .9s var(--ease),opacity .4s}
+
+/* Matriz de capacidades */
+.matrix{display:grid;gap:3px;font-size:12px;overflow-x:auto}
+.matrix .rh{display:flex;align-items:center;gap:6px;padding-right:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.matrix .chd{font:600 10px/12px var(--rgmx-font-sans);letter-spacing:.6px;text-transform:uppercase;color:var(--prizm-neutral-variant-40);text-align:center;padding:0 2px 6px;align-self:end}
+.matrix .c{height:30px;border-radius:var(--radius-sm);display:grid;place-items:center;font-variant-numeric:tabular-nums;font-weight:600;font-size:12px}
+.matrix .c.z{background:var(--prizm-surface-1);color:transparent}
+
+/* ===================================================================== Vista Rediseño */
+.stepbar{display:flex;align-items:center;gap:6px;padding:12px 16px;background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);margin-bottom:16px;overflow-x:auto}
+.st{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius-lg);white-space:nowrap;font-size:13px;color:var(--prizm-neutral-variant-40)}
+.st .n{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--prizm-neutral-95);font-size:11px;font-weight:600}
+.st.on{background:var(--prizm-primary-95);color:var(--prizm-primary-40);font-weight:600}
+.st.on .n{background:var(--prizm-primary-40);color:#fff;animation:pulso 1.1s infinite}
+.st.done{color:var(--prizm-neutral-variant-10)}
+.st.done .n{background:var(--rgmx-success-strong);color:#fff}
+.st-sep{color:var(--prizm-neutral-80);flex:none}
+.stepbar .ronda{margin-left:auto;display:flex;gap:8px;align-items:center;padding-left:12px}
+.run-grid{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:16px;align-items:start}
+.agents{display:flex;flex-direction:column;gap:10px;position:sticky;top:0;max-height:calc(100vh - 56px - 52px - 40px - 24px);overflow:auto;scrollbar-width:thin;padding-right:2px}
+.agent{background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);padding:12px 14px;display:flex;flex-direction:column;gap:8px;transition:box-shadow var(--motion-base),border-color var(--motion-base);border-left:4px solid var(--agc)}
+.agent.act{box-shadow:var(--elevation-2);border-color:var(--agc)}
+.agent .top{display:flex;align-items:center;gap:10px}
+.agent .who{min-width:0;flex:1}
+.agent .who .title-sm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agent .txt{font-size:13px;line-height:18px;color:var(--prizm-neutral-variant-30);white-space:pre-wrap;max-height:92px;overflow:auto;scrollbar-width:thin;-webkit-mask-image:linear-gradient(transparent,#000 12px);mask-image:linear-gradient(transparent,#000 12px);padding-top:2px}
+.agent .txt:empty{display:none}
+.agent .bot{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.agent .tool{display:flex;align-items:center;gap:6px;font:400 11px/16px var(--rgmx-font-mono);color:var(--prizm-neutral-variant-40);min-width:0}
+.agent .tool span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.agent .tool svg{color:var(--rgmx-warning-strong)}
+.agent .cfg{flex:none}
+.blocks{display:flex;flex-direction:column;gap:12px}
+.band .tit{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.band .tit i{width:10px;height:10px;border-radius:3px}
+.bk-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.bk{border:1px solid var(--prizm-neutral-90);border-top:3px solid var(--c);border-radius:var(--radius-lg);padding:8px 10px;background:#fff;animation:entra .45s var(--ease) both}
+.bk b{display:block;font-size:13px;line-height:17px}
+.bk .m{font-size:12px;color:var(--prizm-neutral-variant-40);margin-top:2px;font-variant-numeric:tabular-nums}
+.bk .bar{height:4px;border-radius:var(--radius-full);background:var(--prizm-neutral-95);margin-top:6px;overflow:hidden}
+.bk .bar i{display:block;height:100%;background:var(--c);border-radius:var(--radius-full)}
+@keyframes entra{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.verdict{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;margin-bottom:10px}
+.verdict.ok{background:var(--rgmx-success-bg);color:var(--rgmx-success-fg)}
+.verdict.no{background:var(--rgmx-danger-bg);color:var(--rgmx-danger-fg)}
+.verdict b{font-size:16px;letter-spacing:.6px}
+.list-sig{display:flex;flex-direction:column;gap:8px}
+.attempts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--prizm-neutral-90)}
+.att{display:flex;flex-direction:column;padding:6px 10px;border-radius:var(--radius-lg);background:var(--prizm-surface-1);font-size:12px;font-variant-numeric:tabular-nums}
+.att b{font-size:13px}
+.att.bad b{color:var(--rgmx-danger-text)}.att.good b{color:var(--rgmx-success-fg)}
+.empty{display:grid;place-items:center;text-align:center;gap:8px;color:var(--prizm-neutral-variant-40);padding:28px 16px}
+.empty svg{color:var(--prizm-neutral-80);width:32px;height:32px}
+
+/* ===================================================================== Vista Cómo funciona */
+.flow{display:grid;grid-template-columns:1fr auto 1.2fr auto 1.2fr auto 1fr;gap:10px;align-items:stretch}
+.fnode{border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);padding:14px 16px;background:#fff;display:flex;flex-direction:column;gap:6px}
+.fnode .ic{display:grid;place-items:center;width:36px;height:36px;border-radius:var(--radius-lg)}
+.fnode.code .ic{background:var(--prizm-primary-95);color:var(--prizm-primary-40)}
+.fnode.ai .ic{background:var(--rgmx-warning-bg);color:var(--rgmx-warning-fg)}
+.fnode.data .ic{background:var(--prizm-surface-2);color:var(--prizm-neutral-variant-30)}
+.fnode.ui .ic{background:var(--rgmx-live-bg);color:var(--rgmx-live-fg)}
+.farrow{display:grid;place-items:center;color:var(--prizm-neutral-60)}
+.lane{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px;border-radius:var(--radius-xl);background:var(--prizm-surface-2)}
+.lane .ag{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-full);cursor:pointer;font-size:13px;font-weight:500}
+.lane .ag:hover{box-shadow:var(--elevation-1);border-color:var(--prizm-primary-80)}
+.lane .par{display:flex;flex-direction:column;gap:6px}
+.loop{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--radius-full);border:1px dashed var(--rgmx-series-5);color:var(--rgmx-series-5);font-size:12px;font-weight:600}
+.ag-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.agc{border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);background:#fff;padding:16px;display:flex;flex-direction:column;gap:10px;border-top:3px solid var(--agc)}
+.agc .meta{display:flex;gap:6px;flex-wrap:wrap}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vs ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.vs li{display:flex;gap:8px;font-size:13px;line-height:18px}
+.vs li svg{margin-top:1px}
+.codebox{font:400 12px/18px var(--rgmx-font-mono);background:var(--prizm-surface-1);border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-lg);padding:12px 14px;white-space:pre-wrap;color:var(--prizm-neutral-variant-30);max-height:320px;overflow:auto}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-radius:var(--radius-full);border:1px solid var(--prizm-neutral-90);background:#fff;font-size:12px;color:var(--prizm-neutral-variant-30)}
+
+/* ===================================================================== Modal */
+.scrim{position:fixed;inset:0;background:var(--prizm-scrim);display:none;place-items:center;z-index:50;padding:24px}
+.scrim.on{display:grid}
+.modal{width:min(880px,100%);max-height:calc(100vh - 48px);background:#fff;border-radius:var(--radius-2xl);box-shadow:var(--elevation-3);display:flex;flex-direction:column;overflow:hidden}
+.modal-h{display:flex;align-items:center;gap:12px;padding:18px 24px;border-bottom:1px solid var(--prizm-neutral-90)}
+.modal-h .title-lg{color:var(--prizm-primary-40)}
+.modal-h .sp{flex:1}
+.modal .tabs{padding:0 24px;border-bottom:1px solid var(--prizm-neutral-90);gap:24px;min-height:44px}
+.modal .tab{font-size:14px}
+.modal-b{padding:20px 24px;overflow:auto;flex:1}
+.modal-f{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 24px;border-top:1px solid var(--prizm-neutral-90)}
+.tool-card{border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:10px}
+.tool-card .nm{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.params{width:100%;border-collapse:collapse;margin-top:8px;font-size:12px}
+.params td{padding:6px 8px;border-top:1px solid var(--prizm-neutral-90);vertical-align:top}
+.params td:first-child{font-family:var(--rgmx-font-mono);white-space:nowrap;color:var(--prizm-primary-40)}
+.io{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.io .box{border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-lg);padding:12px 14px}
+#qr .modal{width:auto}
+#qr .modal-b{display:flex;flex-direction:column;align-items:center;gap:12px;padding:28px}
+
+/* ===================================================================== Tooltip */
+#tip{position:fixed;pointer-events:none;background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-lg);box-shadow:var(--elevation-2);padding:8px 10px;font-size:12px;line-height:16px;display:none;z-index:60;max-width:260px}
+#tip b{display:block;font-size:13px}
+
+/* ===================================================================== Pantallas medianas y celular */
+@media (max-width:1400px){
+  .kpi .num{font-size:26px;line-height:32px}
+  .run-grid{grid-template-columns:minmax(280px,320px) minmax(0,1fr)}
+  .ag-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-/* celular */
-@media (max-width: 900px){
-  body{overflow:auto}
-  .app{height:auto}
-  header{flex-wrap:wrap;gap:8px;padding:10px 14px}
-  .controles{flex-wrap:wrap}
-  .fase{min-width:0}
-  .fase{order:3;flex-basis:100%}
-  main{grid-template-columns:minmax(0,1fr);padding:10px;gap:10px}
-  .kpis{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-  .kpi .desp{font-size:22px}
-  .reloj{margin-left:auto}
-  .col{display:contents}
-  .col.centro{display:grid}
-  .kpis{order:1} .centro{order:2;grid-template-rows:auto auto} #agentes{order:3}
-  .abajo{grid-template-columns:1fr}
-  #piramide{height:320px} #tramos{height:220px} #modelo{height:auto}
-  .agente{min-height:0;flex:none} .agente .txt{max-height:110px}
-  .agente:not(.activo):not(.trabajando) .txt{display:none}
-  #panelChro{order:4}
-  footer{display:none}
+@media (max-width:1100px){
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpis.k5{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpi:nth-child(4){border-left:0}
+  .kpi:nth-child(n+4){border-top:1px solid var(--prizm-neutral-90)}
+  .g-2,.g-2e,.g-3{grid-template-columns:minmax(0,1fr)}
+  .flow{grid-template-columns:1fr}
+  .farrow{transform:rotate(90deg);height:20px}
+}
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .topbar{padding:0 14px}
+  .crumb .lvl1,.crumb .sep1{display:none}
+  .crumb{font-size:14px}
+  #runBadge{max-width:38vw}
+  .toolbar .tabs{flex:1 1 100%}
+  .card-b{overflow-x:auto}
+  .toolbar{padding:0 14px;flex-wrap:wrap}
+  .acciones{flex-wrap:wrap;padding:8px 0}
+  .view{padding:16px 14px 32px}
+  .headline-md{font-size:22px;line-height:28px}
+  .kpis,.kpis.k5{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi{border-left:0!important;border-top:1px solid var(--prizm-neutral-90)}
+  .kpi:nth-child(-n+2){border-top:0}
+  .kpi:nth-child(even){border-left:1px solid var(--prizm-neutral-90)!important}
+  .run-grid{grid-template-columns:minmax(0,1fr)}
+  .agents{position:static;max-height:none;overflow:visible}
+  .agent:not(.act) .txt{display:none}
+  .ag-cards,.vs,.io{grid-template-columns:minmax(0,1fr)}
+  .statusbar .hide-sm{display:none}
+  .dt .hide-sm{display:none}
 }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-brainc" viewBox="0 0 24 24"><path d="M12 5a3 3 0 1 0-6 .1 4 4 0 0 0-2 7.4A4 4 0 0 0 12 18z"/><path d="M12 5a3 3 0 1 1 6 .1 4 4 0 0 1 2 7.4A4 4 0 0 1 12 18z"/><path d="M12 5v13M16 9h2M6 13h2"/></symbol>
+    <symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m22 17-8.5-8.5-5 5L2 7"/><path d="M16 17h6v-6"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M9.9 15.5A2 2 0 0 0 8.5 14l-6.1-1.6a.5.5 0 0 1 0-1L8.5 10A2 2 0 0 0 10 8.5l1.6-6.1a.5.5 0 0 1 1 0L14 8.5A2 2 0 0 0 15.5 10l6.1 1.6a.5.5 0 0 1 0 1L15.5 14a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+    <symbol id="i-chevr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+    <symbol id="i-dl" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+    <symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 17h4v4h-4"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></symbol>
+    <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+    <symbol id="i-loop" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></symbol>
+  </defs>
+</svg>
+
 <div class="app" id="app">
-  <header>
-    <div class="brand"><b>Org Redesign Studio</b><span id="empresa">Consumo Andino S.A.A. · empresa ficticia</span></div>
-    <div class="fase"><span class="pill"><span class="dot"></span><span id="fase">Conectando…</span></span></div>
-    <div class="reloj" id="reloj">0:00</div>
-    <div class="controles">
-      <button class="primario" data-modo="vivo" id="bVivo">▶ En vivo</button>
-      <button data-modo="guion">▶ Guion de respaldo</button>
-      <button data-modo="grabacion" id="bGrab">▶ Repetir grabación</button>
-      <button id="bReiniciar">↺ Reiniciar</button>
-      <button id="bQR">QR</button>
+  <aside class="rail" aria-label="Navegación">
+    <div class="tenant" title="Consumo Andino S.A.A. (empresa ficticia)">CA</div>
+    <button class="it on" data-view="org" title="Organización actual" aria-label="Organización actual"><svg class="ico"><use href="#i-users"/></svg></button>
+    <button class="it" data-view="run" title="Rediseño con agentes" aria-label="Rediseño con agentes"><svg class="ico"><use href="#i-brainc"/></svg><span class="dotlive"></span></button>
+    <button class="it" data-view="how" title="Cómo funciona" aria-label="Cómo funciona"><svg class="ico"><use href="#i-code"/></svg></button>
+    <div class="sp"></div>
+    <button class="it" id="bQR" title="Mostrar código QR para que la sala siga la corrida" aria-label="Código QR"><svg class="ico"><use href="#i-qr"/></svg></button>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <nav class="crumb" aria-label="Ruta">
+        <a class="lvl1" data-view="org">Org Redesign Studio</a><span class="sep sep1">›</span>
+        <a data-view="org">Consumo Andino</a><span class="sep">›</span>
+        <b id="crumbPage">Organización actual</b>
+      </nav>
+      <div class="sp"></div>
+      <div class="runstate"><span id="runBadge" class="badge b-draft">En espera</span><span class="clock" id="reloj">0:00</span></div>
+    </header>
+
+    <div class="toolbar">
+      <div class="tabs" role="tablist">
+        <button class="tab on" data-view="org" role="tab"><span class="n">1</span>Organización actual</button>
+        <button class="tab" data-view="run" role="tab"><span class="n">2</span>Rediseño con agentes</button>
+        <button class="tab" data-view="how" role="tab"><span class="n">3</span>Cómo funciona</button>
+      </div>
+      <div class="sp"></div>
+      <div class="acciones">
+        <button class="btn btn-text sm" id="bReiniciar" title="Borra la corrida actual en todas las pantallas"><svg class="ico sm"><use href="#i-undo"/></svg>Reiniciar</button>
+        <button class="btn btn-outlined sm" data-modo="grabacion" id="bGrab" title="Repite la última corrida en vivo con su ritmo original">Repetir grabación</button>
+        <button class="btn btn-outlined sm" data-modo="guion" title="Mismo flujo con cálculos reales y textos pre-escritos; no usa IA">Guion de respaldo</button>
+        <button class="btn btn-primary sm" data-modo="vivo" id="bVivo" title="Lanza los 6 agentes con la API de Claude"><svg class="ico sm"><use href="#i-play"/></svg>Lanzar agentes</button>
+      </div>
     </div>
-  </header>
-  <main>
-    <section class="col" aria-label="Agentes"><div id="agentes"></div></section>
-    <section class="col centro">
-      <div class="panel">
-        <h2>Pirámide por capas <span class="leyenda"><span><i style="background:var(--antes)"></i>Hoy</span><span><i style="background:var(--despues)"></i>Propuesta</span></span></h2>
-        <div id="piramide"></div>
-      </div>
-      <div class="abajo">
-        <div class="panel"><h2><span id="tituloModelo">Organización actual por área</span> <small id="subModelo"></small></h2><div id="modelo"></div></div>
-        <div class="panel"><h2>Tramos de control <small>jefes por número de reportes</small></h2><div id="tramos"></div></div>
-      </div>
-    </section>
-    <section class="col">
-      <div class="kpis" id="kpis"></div>
-      <div class="panel" id="panelChro" style="flex:1;display:flex;flex-direction:column"><h2>Revisión del CHRO</h2><div id="chro"></div></div>
-    </section>
-  </main>
-  <footer><span class="lbl">Bitácora</span><span id="ticker">—</span><a href="/api/descargar/actual.csv">Descargar organigrama actual (CSV)</a></footer>
+
+    <div class="content" id="content">
+      <!-- ============================================================ 1. ORGANIZACIÓN ACTUAL -->
+      <section class="view on" id="v-org">
+        <div class="page-h">
+          <div>
+            <div class="overline blue">Diagnóstico · antes de los agentes</div>
+            <h1 class="headline-md" id="orgTitle">Consumo Andino hoy</h1>
+            <p>Cómo está organizada la empresa antes del rediseño: capas, tramos de control, costo de las jefaturas y capacidades duplicadas. Empresa ficticia con datos sintéticos.</p>
+          </div>
+          <div class="right"><span class="pill-sum" id="orgPill">—</span></div>
+        </div>
+        <div class="kpis" id="orgKpis"></div>
+        <div class="g g-2">
+          <div class="card">
+            <div class="card-h"><div><div class="overline">Pirámide por capas</div><div class="title-md">Las capas 8 a 10 superan la meta del CEO</div></div><div class="legend" id="grpLegend"></div></div>
+            <div class="card-b"><div class="chart" id="orgPiramide" style="height:360px"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><div><div class="overline">Tramos de control</div><div class="title-md" id="tramosTitle">Jefes según cuántos reportes directos tienen</div></div></div>
+            <div class="card-b">
+              <div class="chart" id="orgTramos" style="height:250px"></div>
+              <div class="legend" style="margin-top:10px"><span><i style="background:var(--rgmx-tl-red)"></i>Muy bajo</span><span><i style="background:var(--rgmx-tl-yellow)"></i>Bajo</span><span><i style="background:var(--rgmx-tl-green)"></i>Sano</span></div>
+              <div class="overline" style="margin-top:16px">Primera línea por tipo de trabajo</div>
+              <div id="orgTipos" style="margin-top:8px"></div>
+            </div>
+          </div>
+        </div>
+        <div class="g g-3" id="orgSignals"></div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-h"><div><div class="overline">Áreas</div><div class="title-md">Dónde están las capas de más y los tramos bajos</div></div><div class="legend" id="grpLegend2"></div></div>
+          <div class="card-b" style="overflow-x:auto;padding-top:8px"><table class="dt" id="orgTabla"></table></div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-h"><div><div class="overline">Capacidades × áreas</div><div class="title-md" id="matTitle">Capacidades que viven en más de un área</div></div><span class="caption">Personas por celda · más oscuro = más gente</span></div>
+          <div class="card-b"><div class="matrix" id="orgMatriz"></div></div>
+        </div>
+        <div class="note" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="flex:1;min-width:260px"><b>Siguiente paso ·</b> seis agentes de IA rediseñan esta organización hacia un modelo producto-plataforma con máximo 7 capas, y un CHRO escéptico revisa el resultado.</div>
+          <button class="btn btn-tonal" data-view="run">Ver rediseño con agentes<svg class="ico sm"><use href="#i-arrow"/></svg></button>
+        </div>
+      </section>
+
+      <!-- ============================================================ 2. REDISEÑO -->
+      <section class="view" id="v-run">
+        <div class="page-h">
+          <div>
+            <div class="overline blue">Rediseño · equipo de agentes</div>
+            <h1 class="headline-md" id="runTitle">Seis agentes rediseñan la organización</h1>
+            <p id="runSub">La IA propone, el motor de cálculo cuantifica y el CHRO aprueba. Pulsa el botón de configuración de cualquier agente para ver cómo está armado.</p>
+          </div>
+        </div>
+        <div class="stepbar" id="stepbar"></div>
+        <div class="kpis k5" id="runKpis"></div>
+        <div class="run-grid">
+          <div class="agents" id="agentes"></div>
+          <div>
+            <div class="g g-2e">
+              <div class="card">
+                <div class="card-h"><div><div class="overline">Pirámide por capas</div><div class="title-md">Hoy contra la propuesta</div></div><div class="legend"><span><i style="background:var(--hoy)"></i>Hoy</span><span><i style="background:var(--propuesta)"></i>Propuesta</span></div></div>
+                <div class="card-b"><div class="chart" id="runPiramide" style="height:330px"></div></div>
+              </div>
+              <div class="card">
+                <div class="card-h"><div><div class="overline" id="modeloOver">Modelo producto-plataforma</div><div class="title-md" id="modeloTitle">Esperando al diseñador</div></div><div class="legend"><span><i style="background:var(--blk-producto)"></i>Producto</span><span><i style="background:var(--blk-plataforma)"></i>Plataforma</span><span><i style="background:var(--blk-habilitador)"></i>Habilitador</span></div></div>
+                <div class="card-b"><div class="blocks" id="modelo"></div></div>
+              </div>
+            </div>
+            <div class="g g-2e">
+              <div class="card">
+                <div class="card-h"><div><div class="overline">Tramos de control</div><div class="title-md">Jefes por número de reportes</div></div><div class="legend"><span><i style="background:var(--hoy)"></i>Hoy</span><span><i style="background:var(--propuesta)"></i>Propuesta</span></div></div>
+                <div class="card-b"><div class="chart" id="runTramos" style="height:240px"></div></div>
+              </div>
+              <div class="card">
+                <div class="card-h"><div><div class="overline">Revisión del CHRO</div><div class="title-md">El diseño debe pasar su revisión</div></div></div>
+                <div class="card-b" id="chro"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ 3. CÓMO FUNCIONA -->
+      <section class="view" id="v-how">
+        <div class="page-h">
+          <div>
+            <div class="overline blue">Detrás de escena</div>
+            <h1 class="headline-md">Cómo funciona Org Redesign Studio</h1>
+            <p>La IA decide el diseño; el código hace todas las cuentas. Así los números siempre cuadran y cada decisión queda a la vista.</p>
+          </div>
+          <div class="right chips" id="stack"></div>
+        </div>
+        <div class="card" style="margin-bottom:16px"><div class="card-b" style="padding-top:20px">
+          <div class="flow">
+            <div class="fnode data"><div class="ic"><svg class="ico"><use href="#i-db"/></svg></div><div class="title-sm">Datos</div><div class="caption">3,744 posiciones sintéticas con jefe, cargo, área, capacidad y costo.</div></div>
+            <div class="farrow"><svg class="ico"><use href="#i-arrow"/></svg></div>
+            <div class="fnode ai"><div class="ic"><svg class="ico"><use href="#i-spark"/></svg></div><div class="title-sm">6 agentes de IA · deciden</div><div class="caption">Cada uno tiene instrucciones y herramientas propias. Proponen el modelo, eligen los tramos y revisan riesgos.</div></div>
+            <div class="farrow"><svg class="ico"><use href="#i-loop"/></svg></div>
+            <div class="fnode code"><div class="ic"><svg class="ico"><use href="#i-cpu"/></svg></div><div class="title-sm">Motor de cálculo · cuantifica</div><div class="caption">Código Python determinístico: arma el organigrama desde la base y calcula capas, tramos, costo e impacto.</div></div>
+            <div class="farrow"><svg class="ico"><use href="#i-arrow"/></svg></div>
+            <div class="fnode ui"><div class="ic"><svg class="ico"><use href="#i-monitor"/></svg></div><div class="title-sm">Interfaz en vivo</div><div class="caption">Cada paso se transmite al instante a todas las pantallas conectadas.</div></div>
+          </div>
+        </div></div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-h"><div><div class="overline">Flujo de la corrida</div><div class="title-md">Si el CHRO objeta, el equipo corrige en una segunda ronda</div></div></div>
+          <div class="card-b"><div class="lane" id="lane"></div></div>
+        </div>
+        <div class="vs" style="margin-bottom:16px">
+          <div class="card"><div class="card-b" style="padding-top:16px">
+            <div class="overline" style="color:var(--rgmx-warning-fg)">Lo que decide la IA</div>
+            <ul>
+              <li><svg class="ico sm" style="color:var(--rgmx-warning-strong)"><use href="#i-spark"/></svg>Qué equipos de producto, plataformas y habilitadores crear.</li>
+              <li><svg class="ico sm" style="color:var(--rgmx-warning-strong)"><use href="#i-spark"/></svg>Qué tramo de control usar por tipo de trabajo y cuándo ajustarlo.</li>
+              <li><svg class="ico sm" style="color:var(--rgmx-warning-strong)"><use href="#i-spark"/></svg>Qué riesgos son aceptables y qué objetar (CHRO).</li>
+              <li><svg class="ico sm" style="color:var(--rgmx-warning-strong)"><use href="#i-spark"/></svg>Cómo explicar cada paso en lenguaje de negocio.</li>
+            </ul>
+          </div></div>
+          <div class="card"><div class="card-b" style="padding-top:16px">
+            <div class="overline blue">Lo que calcula el código</div>
+            <ul>
+              <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>Capas, tramos, jefaturas y costo sobre las 3,744 posiciones.</li>
+              <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>El organigrama propuesto, posición por posición.</li>
+              <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>Las validaciones: cada capacidad y categoría en un solo bloque.</li>
+              <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>Los chequeos de riesgo que usa el CHRO.</li>
+            </ul>
+          </div></div>
+        </div>
+        <div class="overline" style="margin-bottom:8px">Los seis agentes</div>
+        <div class="ag-cards" id="agCards" style="margin-bottom:16px"></div>
+        <div class="g g-2e">
+          <div class="card"><div class="card-h"><div><div class="overline">El encargo que reciben todos</div><div class="title-md">Brief del CEO</div></div></div><div class="card-b"><div class="codebox" id="caso"></div></div></div>
+          <div class="card"><div class="card-h"><div><div class="overline">Reglas por defecto del motor</div><div class="title-md">Tramos de control de partida</div></div></div><div class="card-b" id="reglas"></div></div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="statusbar">
+      <span class="lbl">Bitácora</span><span id="ticker">—</span>
+      <span class="sp"></span>
+      <span class="hide-sm" id="sbInfo">3,744 posiciones · datos sintéticos</span>
+      <a class="hide-sm" href="/api/descargar/actual.csv"><svg class="ico xs"><use href="#i-dl"/></svg>Organigrama actual</a>
+      <a class="hide-sm" id="dlProp" href="/api/descargar/propuesta.csv" style="display:none"><svg class="ico xs"><use href="#i-dl"/></svg>Propuesta</a>
+    </footer>
+  </div>
 </div>
+
+<!-- Modal de configuración de agente -->
+<div class="scrim" id="mAgente" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="modal">
+    <div class="modal-h">
+      <div class="avatar av-40" id="mAv"></div>
+      <div><div class="title-lg" id="mTitle"></div><div class="caption" id="mRol"></div></div>
+      <div class="sp"></div>
+      <button class="icon-btn" data-close aria-label="Cerrar"><svg class="ico"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="tabs" id="mTabs">
+      <button class="tab on" data-mt="inst">Instrucciones</button>
+      <button class="tab" data-mt="herr">Herramientas</button>
+      <button class="tab" data-mt="io">Entradas y salidas</button>
+      <button class="tab" data-mt="run">En esta corrida</button>
+    </div>
+    <div class="modal-b" id="mBody"></div>
+    <div class="modal-f"><div class="chips" id="mMeta"></div><button class="btn btn-text" data-close>Cerrar</button></div>
+  </div>
+</div>
+<div class="scrim" id="qr"><div class="modal"><div class="modal-h"><div class="title-lg">Sigan a los agentes en vivo</div><div class="sp"></div><button class="icon-btn" data-close aria-label="Cerrar"><svg class="ico"><use href="#i-x"/></svg></button></div><div class="modal-b"><div id="qrcode"></div><div class="mono" id="qrurl" style="font-size:16px"></div></div></div></div>
 <div id="tip"></div>
-<div id="qr"><div class="caja"><b>Sigan a los agentes en vivo</b><div id="qrcode"></div><span id="qrurl"></span></div></div>
 
 <script>
-// La clave del presentador se guarda en la pestaña y se borra de la barra de direcciones,
-// para que no quede visible en el proyector.
+// ============================================================================ utilidades
 const params = new URLSearchParams(location.search);
 let TOKEN = params.get('admin');
 try {
@@ -188,15 +562,30 @@ try {
 } catch (e) {}
 if (TOKEN) document.getElementById('app').classList.add('admin');
 const $ = s => document.querySelector(s);
-const fmt = n => typeof n === 'number' ? n.toLocaleString('es-PE', {maximumFractionDigits: 1}) : n;
+const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const INICIALES = {diagnostico:'D', capacidades:'C', disenador:'P', optimizador:'S', impacto:'$', chro:'H'};
-const ESTADOS = {'en espera':'En espera', pensando:'Pensando', trabajando:'Calculando', listo:'Listo', error:'Error'};
+const MINUS = '−';
+const n0 = v => v == null ? '—' : Math.round(v).toLocaleString('en-US');
+const n1 = v => v == null ? '—' : Number(v).toLocaleString('en-US', {minimumFractionDigits:1, maximumFractionDigits:1});
+const money = v => v == null ? '—' : `$${n1(v)}M`;
+const signed = (v, dec = 1, suf = '%') => v == null ? '' : (v > 0 ? '+' : v < 0 ? MINUS : '') + Math.abs(v).toFixed(dec) + suf;
+const ico = (id, cls = 'sm') => `<svg class="ico ${cls}"><use href="#i-${id}"/></svg>`;
+function delta(pct, mejor){ // mejor: 'baja' | 'sube'
+  if (pct == null || !isFinite(pct)) return '';
+  if (Math.abs(pct) < 0.05) return `<span class="delta flat" title="Sin cambio">${ico('minus','xs')}0.0%</span>`;
+  const bueno = (pct < 0) === (mejor === 'baja');
+  return `<span class="delta ${bueno ? 'good' : 'bad'}">${ico(pct > 0 ? 'up' : 'down','xs')}${signed(pct)}</span>`;
+}
+const AG_COLOR = id => `var(--ag-${id})`;
+const INICIALES = {diagnostico:'DG', capacidades:'MC', disenador:'DP', optimizador:'SL', impacto:'IM', chro:'HR'};
+const ESTADO_BADGE = {'en espera':['b-draft','En espera'], pensando:['b-info','Pensando'], trabajando:['b-pending','Calculando'], listo:['b-ok','Listo'], error:['b-high','Error']};
+const PASOS = [['diagnostico','Diagnóstico'],['capacidades','Capacidades'],['disenador','Diseño'],['optimizador','Span & layers'],['impacto','Impacto'],['chro','CHRO']];
+const GRP_VAR = {'Supply Chain':'--grp-supply','Fuerza de ventas':'--grp-ventas','Unidades de negocio':'--grp-bu','Funciones corporativas':'--grp-corp'};
+const TIPO_ES = {operativo:'Operativo (plantas y almacenes)', comercial_campo:'Comercial de campo', profesional:'Profesional', especialista:'Especialista'};
 
-let E = null;       // estado (mismo esquema que app/bus.py)
-let empresa = null;
+let E = null, empresa = null, ORG = null, CFG = null, vista = 'org';
 
-// ------------------------------------------------------------------ reducer (espejo de bus.aplicar)
+// ============================================================================ estado (espejo de app/bus.py)
 function estadoInicial(){
   const ag = {};
   (empresa?.agentes || []).forEach(a => ag[a.id] = {...a, estado:'en espera', texto:'', herramientas:[], ronda:1});
@@ -205,7 +594,7 @@ function estadoInicial(){
 function aplicar(ev){
   const t = ev.type;
   if (t === 'reset'){ E = estadoInicial(); }
-  else if (t === 'run_start'){ E = estadoInicial(); Object.assign(E.corrida, {estado:'corriendo', modo:ev.modo, inicio:ev.ts}); }
+  else if (t === 'run_start'){ E = estadoInicial(); Object.assign(E.corrida, {estado:'corriendo', modo:ev.modo, inicio:ev.ts}); irA('run'); }
   else if (t === 'phase'){ E.corrida.fase = ev.name; E.bitacora.push({ts:ev.ts, texto:ev.name}); }
   else if (t === 'agent_status'){ const a = E.agentes[ev.agent]; a.estado = ev.status;
     if (ev.ronda){ a.ronda = ev.ronda; if (ev.status === 'pensando' && ev.ronda > 1) a.texto += '\n\n— Ronda 2 —\n'; } }
@@ -216,216 +605,424 @@ function aplicar(ev){
   else if (t === 'run_end'){ Object.assign(E.corrida, {estado: ev.estado || 'terminada', fin: ev.ts, fase: ev.fase || 'Diseño listo'}); }
 }
 
-// ------------------------------------------------------------------ render
-let pendiente = false;
-function render(){ if (!pendiente){ pendiente = true; requestAnimationFrame(() => { pendiente = false; dibujar(); }); } }
+// ============================================================================ navegación
+function irA(v){
+  vista = v;
+  $$('.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + v));
+  $$('[data-view]').forEach(b => b.classList.toggle('on', b.dataset.view === v && (b.classList.contains('tab') || b.classList.contains('it'))));
+  $('#crumbPage').textContent = {org:'Organización actual', run:'Rediseño con agentes', how:'Cómo funciona'}[v];
+  $('#content').scrollTop = 0;
+  render();
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-view]'); if (b){ irA(b.dataset.view); return; }
+  const c = e.target.closest('[data-cfg]'); if (c){ abrirAgente(c.dataset.cfg); return; }
+  if (e.target.closest('[data-close]') || e.target.classList.contains('scrim')) $$('.scrim').forEach(s => s.classList.remove('on'));
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') $$('.scrim').forEach(s => s.classList.remove('on')); });
 
-function dibujar(){
-  if (!E) return;
-  document.getElementById('app').classList.toggle('corriendo', E.corrida.estado === 'corriendo');
-  $('#fase').textContent = E.corrida.fase;
-  const ult = E.bitacora[E.bitacora.length - 1];
-  $('#ticker').textContent = ult ? (ult.agente ? `${E.agentes[ult.agente]?.nombre}: ` : '') + ult.texto : '—';
-  document.querySelectorAll('.controles button[data-modo]').forEach(b => b.disabled = E.corrida.estado === 'corriendo');
-  agentes(); piramide(); tramos(); modelo(); kpis(); chro();
+// ============================================================================ tooltip
+const tipEl = $('#tip');
+function tip(e, html){ tipEl.innerHTML = html; tipEl.style.display = 'block';
+  const x = Math.min(e.clientX + 14, innerWidth - 270); tipEl.style.left = x + 'px'; tipEl.style.top = (e.clientY + 14) + 'px'; }
+function untip(){ tipEl.style.display = 'none'; }
+document.addEventListener('mousemove', e => { const t = e.target.closest('[data-tip]'); if (t) tip(e, t.dataset.tip); else untip(); });
+
+// ============================================================================ SVG helpers
+function svgEn(cont){
+  const w = cont.clientWidth, h = cont.clientHeight;
+  let svg = cont.querySelector('svg');
+  if (!svg){ cont.innerHTML = ''; svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); cont.appendChild(svg); }
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  return [svg, w, h];
+}
+function nodo(svg, tag, attrs, id, txt){
+  let n = id ? svg.querySelector(`[data-k="${id}"]`) : null;
+  if (!n){ n = document.createElementNS('http://www.w3.org/2000/svg', tag); if (id) n.dataset.k = id; svg.appendChild(n); }
+  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+  if (txt != null) n.textContent = txt;
+  return n;
+}
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// ============================================================================ VISTA 1: organización actual
+function vistaOrg(){
+  if (!ORG) return;
+  const m = ORG.metricas, meta = ORG.meta_capas;
+  $('#orgTitle').textContent = `Consumo Andino hoy: ${n0(m.personas)} personas en ${m.capas} capas`;
+  $('#orgPill').textContent = `${ORG.focos_por_area.length} áreas · ${n0(m.jefaturas)} jefaturas · ${ORG.duplicadas.length} capacidades duplicadas`;
+  const pctJef = 100 * m.costo_jefaturas_musd / m.costo_total_musd;
+  const kp = [
+    ['Capas', m.capas, `<span class="delta bad">${ico('up','xs')}+${m.capas - meta} vs meta</span>`, `Meta del CEO: ${meta} capas como máximo`],
+    ['Tramo promedio', n1(m.tramo_promedio), '', `${n1(m.pct_jefes_tramo_bajo)}% de los jefes tiene 3 reportes o menos`],
+    ['Jefaturas', n0(m.jefaturas), '', `${n1(m.pct_jefaturas)}% de la dotación tiene gente a cargo`],
+    ['Jefes con 1 reporte', n0(m.jefes_un_reporte), '', 'Cadenas de jefes que solo supervisan a otro jefe'],
+    ['Costo de jefaturas', money(m.costo_jefaturas_musd), '', `${n1(pctJef)}% del costo de personal (${money(m.costo_total_musd)})`],
+    ['Capacidades duplicadas', ORG.duplicadas.length, '', 'Viven en más de un área a la vez'],
+  ];
+  const h = kp.map(([l, v, d, c]) => `<div class="kpi"><div class="overline">${l}</div><div class="v"><span class="num">${v}</span>${d}</div><div class="caption" title="${esc(c)}">${c}</div></div>`).join('');
+  if ($('#orgKpis').dataset.h !== h){ $('#orgKpis').dataset.h = h; $('#orgKpis').innerHTML = h; }
+  const leg = ORG.grupos.map(g => `<span><i style="background:var(${GRP_VAR[g]})"></i>${g}</span>`).join('');
+  $('#grpLegend').innerHTML = leg; $('#grpLegend2').innerHTML = leg;
+  piramideGrupos(); tramosOrg(); tiposOrg(); senalesOrg(); tablaAreas(); matriz();
 }
 
+function yaDibujado(cont){ const k = cont.clientWidth + 'x' + cont.clientHeight; if (cont.dataset.h === k) return true; cont.dataset.h = k; return false; }
+function piramideGrupos(){
+  const cont = $('#orgPiramide'); if (yaDibujado(cont)) return; const [svg, w, h] = svgEn(cont); svg.innerHTML = '';
+  const filas = ORG.piramide_por_grupo, meta = ORG.meta_capas;
+  const tot = r => ORG.grupos.reduce((s, g) => s + r[g], 0);
+  const max = Math.max(...filas.map(tot));
+  const izq = 64, der = 56, fila = (h - 4) / filas.length, alto = Math.min(24, fila - 6);
+  filas.forEach((r, i) => {
+    const y = 2 + i * fila + (fila - alto) / 2;
+    if (r.capa > meta) nodo(svg, 'rect', {x: 0, y: 2 + i * fila, width: w, height: fila, fill: css('--rgmx-danger-bg'), opacity: .55});
+    nodo(svg, 'text', {x: 8, y: y + alto / 2 + 4, 'font-weight': 600, fill: r.capa > meta ? css('--rgmx-danger-text') : css('--prizm-neutral-variant-30')}, null, `Capa ${r.capa}`);
+    let x = izq; const t = tot(r);
+    ORG.grupos.forEach(g => {
+      const ww = (w - izq - der) * r[g] / max; if (!r[g]) return;
+      const rect = nodo(svg, 'rect', {x, y, width: Math.max(ww - 1.5, 1), height: alto, rx: 3, fill: css(GRP_VAR[g])});
+      rect.dataset.tip = `<b>Capa ${r.capa} · ${g}</b>${n0(r[g])} personas`;
+      x += ww;
+    });
+    nodo(svg, 'text', {x: x + 6, y: y + alto / 2 + 4, class: 'v'}, null, n0(t));
+  });
+  const ym = 2 + meta * fila;
+  nodo(svg, 'line', {x1: 0, x2: w, y1: ym, y2: ym, stroke: css('--rgmx-danger-strong'), 'stroke-dasharray': '5 4', 'stroke-width': 1.5});
+  nodo(svg, 'text', {x: w - 4, y: ym - 6, 'text-anchor': 'end', fill: css('--rgmx-danger-text'), 'font-weight': 600}, null, `Meta del CEO: ${meta} capas`);
+}
+
+const SEMAFORO = {'1':'--rgmx-tl-red','2-3':'--rgmx-tl-yellow','4-6':'--rgmx-tl-yellow','7-10':'--rgmx-tl-green','11-15':'--rgmx-tl-green','16+':'--rgmx-tl-yellow'};
+function tramosOrg(){
+  const cont = $('#orgTramos'); if (yaDibujado(cont)) return; const [svg, w, h] = svgEn(cont); svg.innerHTML = '';
+  const d = ORG.metricas.distribucion_tramos, max = Math.max(...d.map(r => r.jefes));
+  const base = h - 24, top = 20, g = w / d.length, bw = Math.min(56, g - 18);
+  nodo(svg, 'line', {x1: 0, x2: w, y1: base, y2: base, stroke: css('--prizm-neutral-90')});
+  d.forEach((r, i) => {
+    const x = i * g + (g - bw) / 2, hh = (base - top) * r.jefes / max;
+    const rect = nodo(svg, 'rect', {x, y: base - hh, width: bw, height: Math.max(hh, 1), rx: 4, fill: css(SEMAFORO[r.tramo])});
+    rect.dataset.tip = `<b>${r.tramo} reportes</b>${n0(r.jefes)} jefes`;
+    nodo(svg, 'text', {x: x + bw / 2, y: base - hh - 6, 'text-anchor': 'middle', class: 'v'}, null, n0(r.jefes));
+    nodo(svg, 'text', {x: x + bw / 2, y: h - 6, 'text-anchor': 'middle'}, null, r.tramo);
+  });
+  const bajos = d.filter(r => r.tramo === '1' || r.tramo === '2-3').reduce((s, r) => s + r.jefes, 0);
+  $('#tramosTitle').textContent = `${n0(bajos)} jefes tienen 3 reportes o menos`;
+}
+
+function tiposOrg(){
+  const tot = ORG.contribuidores_por_tipo.reduce((s, r) => s + r.personas, 0);
+  const cols = ['--rgmx-series-1','--rgmx-series-2','--rgmx-series-3','--rgmx-series-4'];
+  const h = `<div style="display:flex;height:12px;border-radius:9999px;overflow:hidden;gap:2px">${ORG.contribuidores_por_tipo.map((r, i) =>
+      `<i style="flex:${r.personas};background:var(${cols[i]})" data-tip="<b>${TIPO_ES[r.tipo]}</b>${n0(r.personas)} personas"></i>`).join('')}</div>
+    <div class="legend" style="margin-top:8px">${ORG.contribuidores_por_tipo.map((r, i) =>
+      `<span><i style="background:var(${cols[i]})"></i>${TIPO_ES[r.tipo]} · <b class="tabular">${n1(100 * r.personas / tot)}%</b></span>`).join('')}</div>`;
+  if ($('#orgTipos').dataset.h !== h){ $('#orgTipos').dataset.h = h; $('#orgTipos').innerHTML = h; }
+}
+
+function senalesOrg(){
+  const f = ORG.focos_por_area, meta = ORG.meta_capas;
+  const peorTramo = [...f].sort((a, b) => a.tramo_promedio - b.tramo_promedio)[0];
+  const masProfunda = [...f].sort((a, b) => b.capa_mas_profunda - a.capa_mas_profunda)[0];
+  const dup = ORG.matriz_capacidades.filter(r => r.duplicada && r.celdas.filter(Boolean).length >= 3 && !['Finanzas'].includes(r.capacidad))
+    .sort((a, b) => b.celdas.filter(Boolean).length - a.celdas.filter(Boolean).length)[0];
+  const cadena = ORG.ejemplos_cadenas_un_reporte[0] || '';
+  const s = [
+    ['bad', 'alert', `${masProfunda.area} · llega a ${masProfunda.capa_mas_profunda} capas`, `${n0(masProfunda.personas)} personas; ${masProfunda.capa_mas_profunda - meta} capas por encima de la meta. Ejemplo de cadena: ${cadena}.`],
+    ['warn', 'down', `${peorTramo.area} · tramo promedio de ${n1(peorTramo.tramo_promedio)}`, `${peorTramo.jefaturas} jefaturas para ${peorTramo.personas} personas; ${peorTramo.jefes_un_reporte} jefes con un solo reporte.`],
+    ['info', 'layers', `${dup ? dup.capacidad : 'Capacidades'} · existe en ${dup ? dup.celdas.filter(Boolean).length : 3} áreas`, `Equipos chicos con jefe propio en cada unidad de negocio. Candidata a plataforma compartida.`],
+  ];
+  const h = s.map(([c, i, t, d]) => `<div class="signal ${c}"><div class="ic">${ico(i)}</div><div><div class="title-sm">${esc(t)}</div><div class="caption">${esc(d)}</div></div></div>`).join('');
+  if ($('#orgSignals').dataset.h !== h){ $('#orgSignals').dataset.h = h; $('#orgSignals').innerHTML = h; }
+}
+
+function tablaAreas(){
+  const f = ORG.focos_por_area, max = Math.max(...f.map(r => r.personas)), meta = ORG.meta_capas;
+  const sem = t => t < 4 ? 'var(--rgmx-tl-red)' : t < 7 ? 'var(--rgmx-tl-yellow)' : 'var(--rgmx-tl-green)';
+  const h = `<thead><tr><th>Área</th><th>Personas</th><th>Jefaturas</th><th class="hide-sm">% jefaturas</th><th>Tramo promedio</th><th class="hide-sm">Jefes con 1 reporte</th><th>Capa más profunda</th><th class="hide-sm">Costo anual</th></tr></thead><tbody>${f.map(r => `
+    <tr><td><span class="dot" style="background:var(${GRP_VAR[r.grupo]})"></span><b style="font-weight:500">${esc(r.area)}</b></td>
+    <td><span class="minibar"><i style="width:${100 * r.personas / max}%;background:var(${GRP_VAR[r.grupo]})"></i></span>${n0(r.personas)}</td>
+    <td>${n0(r.jefaturas)}</td><td class="hide-sm">${n1(r.pct_jefaturas)}%</td>
+    <td><span class="dot" style="background:${sem(r.tramo_promedio)}"></span>${n1(r.tramo_promedio)}</td>
+    <td class="hide-sm">${r.jefes_un_reporte}</td>
+    <td>${r.capa_mas_profunda > meta ? `<span class="badge b-high">${r.capa_mas_profunda} capas</span>` : `<span class="badge b-ok">${r.capa_mas_profunda} capas</span>`}</td>
+    <td class="hide-sm">${money(r.costo_musd)}</td></tr>`).join('')}</tbody>`;
+  const t = $('#orgTabla'); if (t.dataset.h !== h){ t.dataset.h = h; t.innerHTML = h; }
+}
+
+const ABREV = {'Supply Chain':'Supply','Ventas Canal Tradicional':'Ventas CT','BU Alimentos':'BU Alim.','BU Cuidado del Hogar':'BU Hogar','BU Bebidas':'BU Bebidas','Gestión Humana':'G. Humana','Finanzas':'Finanzas','Tecnología':'Tecnología','Legal y Asuntos Corporativos':'Legal'};
+function matriz(){
+  const areas = ORG.areas_matriz, filas = ORG.matriz_capacidades;
+  const max = Math.max(...filas.flatMap(r => r.celdas));
+  const dupN = filas.filter(r => r.duplicada).length;
+  $('#matTitle').textContent = `${dupN} capacidades viven en más de un área`;
+  const steps = ['--prizm-primary-95','--prizm-primary-90','--prizm-primary-80','--prizm-primary-70','--prizm-primary-60','--prizm-primary-50','--prizm-primary-40','--prizm-primary-30'];
+  const color = v => { const i = Math.min(steps.length - 1, Math.floor(Math.log(1 + v) / Math.log(1 + max) * steps.length)); return [`var(${steps[i]})`, i >= 5 ? '#fff' : 'var(--prizm-primary-10)']; };
+  let h = `<div class="matrix" style="grid-template-columns:minmax(200px,1.4fr) repeat(${areas.length},minmax(58px,1fr)) 92px"><div></div>`;
+  h += areas.map(a => `<div class="chd" title="${esc(a)}">${esc(ABREV[a] || a)}</div>`).join('') + '<div class="chd">Áreas</div>';
+  filas.forEach(r => {
+    const nA = r.celdas.filter(Boolean).length;
+    h += `<div class="rh">${r.duplicada ? ico('alert','xs').replace('class="ico xs"', 'class="ico xs" style="color:var(--rgmx-warning-strong)"') : '<span style="width:14px"></span>'}<span title="${esc(r.capacidad)}">${esc(r.capacidad)}</span></div>`;
+    h += r.celdas.map((v, i) => { if (!v) return '<div class="c z">·</div>'; const [bg, fg] = color(v);
+      return `<div class="c" style="background:${bg};color:${fg}" data-tip="<b>${esc(r.capacidad)}</b>${esc(areas[i])}: ${n0(v)} personas">${n0(v)}</div>`; }).join('');
+    h += `<div style="display:grid;place-items:center">${nA > 1 ? `<span class="badge b-med">${nA} áreas</span>` : `<span class="badge b-period">1 área</span>`}</div>`;
+  });
+  h += '</div>';
+  const c = $('#orgMatriz'); if (c.dataset.h !== h){ c.dataset.h = h; c.innerHTML = h; }
+}
+
+// ============================================================================ VISTA 2: rediseño
+function vistaRun(){
+  stepbar(); kpisRun(); agentes(); piramideRun(); tramosRun(); modelo(); chro();
+}
+function stepbar(){
+  const A = E.agentes; const ronda = Math.max(...Object.values(A).map(a => a.ronda || 1));
+  const h = PASOS.map(([id, nom], i) => {
+    const a = A[id] || {}; const st = a.estado === 'listo' ? 'done' : (a.estado === 'pensando' || a.estado === 'trabajando') ? 'on' : '';
+    return (i ? `<svg class="ico sm st-sep"><use href="#i-chevr"/></svg>` : '') + `<div class="st ${st}"><span class="n">${st === 'done' ? '✓' : i + 1}</span>${nom}</div>`;
+  }).join('') + `<div class="ronda">${ronda > 1 ? '<span class="badge b-pending">Ronda 2 · corrige objeciones</span>' : '<span class="badge b-period">Ronda 1</span>'}<span class="caption" style="white-space:nowrap">${esc(E.corrida.fase)}</span></div>`;
+  const s = $('#stepbar'); if (s.dataset.h !== h){ s.dataset.h = h; s.innerHTML = h; }
+}
+function kpisRun(){
+  const a = E.datos.asis || (ORG && ORG.metricas), t = E.datos.tobe?.metricas, imp = E.datos.impacto, meta = ORG?.meta_capas || 7;
+  const pct = (x, y) => (x != null && y != null && x) ? 100 * (y - x) / x : null;
+  const k = [
+    ['Capas', a?.capas, t?.capas, 'baja', v => v, `Hoy ${a?.capas ?? '—'} · meta del CEO ${meta}`],
+    ['Tramo promedio', a?.tramo_promedio, t?.tramo_promedio, 'sube', n1, `Hoy ${n1(a?.tramo_promedio)} reportes por jefe`],
+    ['Jefaturas', a?.jefaturas, t?.jefaturas, 'baja', n0, `Hoy ${n0(a?.jefaturas)} posiciones con gente a cargo`],
+    ['Jefes con 1 reporte', a?.jefes_un_reporte, t?.jefes_un_reporte, 'baja', n0, `Hoy ${n0(a?.jefes_un_reporte)}`],
+  ];
+  let h = k.map(([l, x, y, mejor, f, c]) => `<div class="kpi ${y == null ? 'pend' : ''}"><div class="overline">${l}</div>
+    <div class="v"><span class="num">${y == null ? '—' : f(y)}</span>${y == null ? '' : delta(pct(x, y), mejor)}</div>
+    <div class="caption">${y == null ? 'Esperando al optimizador' : c}</div></div>`).join('');
+  h += `<div class="kpi ${imp ? '' : 'pend'}"><div class="overline">Ahorro anual estimado</div><div class="v"><span class="num">${imp ? money(imp.ahorro_anual_musd) : '—'}</span>${imp ? `<span class="delta good">${ico('down','xs')}${MINUS}${n1(imp.ahorro_pct_costo_total)}% costo</span>` : ''}</div>
+    <div class="caption">${imp ? `Costo de personal ${money(imp.antes.costo_total_musd)} → ${money(imp.despues.costo_total_musd)}` : 'Esperando al agente de impacto'}</div></div>`;
+  const c = $('#runKpis'); if (c.dataset.h !== h){ c.dataset.h = h; c.innerHTML = h; }
+}
 function agentes(){
   const cont = $('#agentes');
   Object.values(E.agentes).forEach(a => {
     let el = document.getElementById('ag-' + a.id);
     if (!el){
-      el = document.createElement('article'); el.className = 'agente'; el.id = 'ag-' + a.id;
-      el.innerHTML = `<div class="cab"><div class="ico">${INICIALES[a.id] || '·'}</div><div><div class="nom">${esc(a.nombre)}</div><div class="rol">${esc(a.rol)}</div></div><div class="est"><i></i><span></span></div></div><div class="txt"></div><div class="tool"></div>`;
+      el = document.createElement('article'); el.className = 'agent'; el.id = 'ag-' + a.id; el.style.setProperty('--agc', AG_COLOR(a.id));
+      el.innerHTML = `<div class="top"><div class="avatar av-32" style="background:${AG_COLOR(a.id)}">${INICIALES[a.id]}</div>
+        <div class="who"><div class="title-sm">${esc(a.nombre)}</div><div class="caption">${esc(a.rol)}</div></div><span class="badge"></span></div>
+        <div class="txt"></div>
+        <div class="bot"><div class="tool"></div><button class="btn btn-text sm cfg" data-cfg="${a.id}" title="Ver instrucciones, herramientas y lo que hizo en esta corrida">${ico('code')}Configuración</button></div>`;
       cont.appendChild(el);
     }
-    if (el.dataset.estado !== a.estado && (a.estado === 'pensando' || a.estado === 'trabajando'))
-      el.scrollIntoView({block: 'nearest', behavior: 'smooth'});
-    el.dataset.estado = a.estado;
-    el.classList.toggle('activo', a.estado === 'pensando');
-    el.classList.toggle('trabajando', a.estado === 'trabajando');
-    el.querySelector('.est span').textContent = (ESTADOS[a.estado] || a.estado) + (a.ronda > 1 ? ' · ronda 2' : '');
-    const txt = el.querySelector('.txt');
-    if (txt.textContent !== a.texto.trim()){ txt.textContent = a.texto.trim(); txt.scrollTop = txt.scrollHeight; }
-    const h = a.herramientas[a.herramientas.length - 1];
-    el.querySelector('.tool').innerHTML = h ? `<b>⚙</b> ${esc(h.resumen)}` : '';
+    const [cls, lab] = ESTADO_BADGE[a.estado] || ['b-draft', a.estado];
+    const b = el.querySelector('.badge'); b.className = 'badge ' + cls;
+    b.innerHTML = (a.estado === 'pensando' || a.estado === 'trabajando' ? '<span class="pulse"></span>' : '') + lab + (a.ronda > 1 ? ' · R2' : '');
+    const act = a.estado === 'pensando' || a.estado === 'trabajando';
+    if (act && !el.classList.contains('act') && vista === 'run' && cont.scrollHeight > cont.clientHeight) cont.scrollTo({top: el.offsetTop - cont.offsetTop - 4, behavior: 'smooth'});
+    el.classList.toggle('act', act);
+    const txt = el.querySelector('.txt'), limpio = a.texto.trim();
+    if (txt.textContent !== limpio){ txt.textContent = limpio; txt.scrollTop = txt.scrollHeight; }
+    const hh = a.herramientas[a.herramientas.length - 1];
+    const th = hh ? `${ico('zap','xs')}<span title="${esc(hh.resumen)}">${esc(hh.resumen)}</span>` : '';
+    const tl = el.querySelector('.tool'); if (tl.dataset.h !== th){ tl.dataset.h = th; tl.innerHTML = th; }
   });
 }
-
-function svgEl(cont){
-  const w = cont.clientWidth, h = cont.clientHeight;
-  let svg = cont.querySelector('svg');
-  if (!svg){ cont.innerHTML = ''; svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); cont.appendChild(svg); }
-  svg.setAttribute('width', w); svg.setAttribute('height', h); svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-  return [svg, w, h];
-}
-function nodo(svg, tag, attrs, id){
-  let n = id ? svg.querySelector(`[data-k="${id}"]`) : null;
-  if (!n){ n = document.createElementNS('http://www.w3.org/2000/svg', tag); if (id) n.dataset.k = id; svg.appendChild(n); }
-  for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
-  return n;
-}
-
-function piramide(){
-  const cont = $('#piramide');
-  const asis = E.datos.asis, tobe = E.datos.tobe;
-  if (!asis){ cont.innerHTML = `<div class="vacio">La pirámide aparece cuando el agente de diagnóstico mida la organización.<br>${empresa ? fmt(empresa.personas) + ' personas esperando' : ''}</div>`; return; }
-  const [svg, w, h] = svgEl(cont);
-  const capas = Math.max(asis.capas, tobe?.metricas.capas || 0);
+function piramideRun(){
+  const cont = $('#runPiramide');
+  const asis = E.datos.asis || ORG?.metricas, tobe = E.datos.tobe;
+  if (!asis) return;
+  const [svg, w, h] = svgEn(cont);
   const A = Object.fromEntries(asis.piramide.map(r => [r.capa, r.personas]));
   const T = tobe ? Object.fromEntries(tobe.metricas.piramide.map(r => [r.capa, r.personas])) : {};
+  const capas = Math.max(asis.capas, tobe?.metricas.capas || 0);
   const max = Math.max(...Object.values(A), ...Object.values(T));
-  const centro = w / 2, eje = 64, ancho = (w - eje) / 2 - 56;
-  const fila = (h - 8) / capas, alto = Math.min(26, fila - 4);
-  for (let c = 1; c <= 12; c++){
-    const visible = c <= capas;
-    const y = 4 + (c - 1) * fila + (fila - alto) / 2;
-    const a = A[c] || 0, t = T[c] || 0;
+  const c = w / 2, eje = 64, ancho = (w - eje) / 2 - 48, fila = (h - 4) / capas, alto = Math.min(22, fila - 5);
+  for (let k = 1; k <= 12; k++){
+    const vis = k <= capas, y = 2 + (k - 1) * fila + (fila - alto) / 2, a = A[k] || 0, t = T[k] || 0;
     const wa = a ? Math.max(2, ancho * a / max) : 0, wt = t ? Math.max(2, ancho * t / max) : 0;
-    nodo(svg, 'text', {x: centro, y: y + alto / 2 + 4, 'text-anchor':'middle', 'font-weight':600, opacity: visible ? 1 : 0}, 'l' + c).textContent = `Capa ${c}`;
-    const ra = nodo(svg, 'rect', {class:'barra', x: centro - eje / 2 - wa, y, width: wa, height: alto, rx: 4, fill:'var(--antes)', opacity: visible ? 1 : 0}, 'a' + c);
-    ra.onmousemove = e => tip(e, `Hoy · capa ${c}: ${fmt(a)} personas`); ra.onmouseleave = untip;
-    nodo(svg, 'text', {x: centro - eje / 2 - wa - 6, y: y + alto / 2 + 4, 'text-anchor':'end', opacity: visible && a ? 1 : 0}, 'va' + c).textContent = fmt(a);
-    const rt = nodo(svg, 'rect', {class:'barra', x: centro + eje / 2, y, width: wt, height: alto, rx: 4, fill:'var(--despues)', opacity: visible && t ? 1 : 0}, 't' + c);
-    rt.onmousemove = e => tip(e, `Propuesta · capa ${c}: ${fmt(t)} personas`); rt.onmouseleave = untip;
-    nodo(svg, 'text', {x: centro + eje / 2 + wt + 6, y: y + alto / 2 + 4, opacity: visible && t ? 1 : 0, fill:'var(--text)'}, 'vt' + c).textContent = fmt(t);
+    nodo(svg, 'text', {x: c, y: y + alto / 2 + 4, 'text-anchor': 'middle', 'font-weight': 600, opacity: vis ? 1 : 0}, 'l' + k, `Capa ${k}`);
+    nodo(svg, 'rect', {class: 'trans', x: c - eje / 2 - wa, y, width: wa, height: alto, rx: 3, fill: css('--hoy'), opacity: vis ? 1 : 0}, 'a' + k).dataset.tip = `<b>Hoy · capa ${k}</b>${n0(a)} personas`;
+    nodo(svg, 'text', {x: c - eje / 2 - wa - 6, y: y + alto / 2 + 4, 'text-anchor': 'end', opacity: vis && a ? 1 : 0}, 'va' + k, n0(a));
+    nodo(svg, 'rect', {class: 'trans', x: c + eje / 2, y, width: wt, height: alto, rx: 3, fill: css('--propuesta'), opacity: vis && t ? 1 : 0}, 't' + k).dataset.tip = `<b>Propuesta · capa ${k}</b>${n0(t)} personas`;
+    nodo(svg, 'text', {x: c + eje / 2 + wt + 6, y: y + alto / 2 + 4, class: 'v', opacity: vis && t ? 1 : 0}, 'vt' + k, n0(t));
   }
-  if (!tobe) nodo(svg, 'text', {x: centro + eje / 2 + 12, y: h / 2, fill:'var(--text-3)'}, 'espera').textContent = 'La propuesta aparece cuando el optimizador diseñe las jefaturas';
-  else { const n = svg.querySelector('[data-k="espera"]'); if (n) n.remove(); }
+  nodo(svg, 'text', {x: c + eje / 2 + 8, y: h / 2, opacity: tobe ? 0 : 1}, 'espera', 'Propuesta: esperando al optimizador');
 }
-
-function tramos(){
-  const cont = $('#tramos');
-  const asis = E.datos.asis, tobe = E.datos.tobe;
-  if (!asis){ cont.innerHTML = '<div class="vacio">Esperando el diagnóstico</div>'; return; }
-  const [svg, w, h] = svgEl(cont);
-  const A = asis.distribucion_tramos, T = tobe?.metricas.distribucion_tramos;
+function tramosRun(){
+  const asis = E.datos.asis || ORG?.metricas; if (!asis) return;
+  const cont = $('#runTramos'); const [svg, w, h] = svgEn(cont);
+  const A = asis.distribucion_tramos, T = E.datos.tobe?.metricas.distribucion_tramos;
   const max = Math.max(...A.map(r => r.jefes), ...(T || []).map(r => r.jefes));
-  const base = h - 22, top = 16, grupo = w / A.length, bw = Math.min(22, grupo / 2 - 6);
-  nodo(svg, 'line', {x1: 0, x2: w, y1: base, y2: base, stroke:'var(--border-2)'}, 'base');
+  const base = h - 22, top = 18, g = w / A.length, bw = Math.min(26, g / 2 - 6);
+  nodo(svg, 'line', {x1: 0, x2: w, y1: base, y2: base, stroke: css('--prizm-neutral-90')}, 'base');
   A.forEach((r, i) => {
-    const x = i * grupo + grupo / 2;
-    const ha = (base - top) * r.jefes / max, ht = T ? (base - top) * T[i].jefes / max : 0;
-    const ba = nodo(svg, 'rect', {class:'barra', x: x - bw - 1, y: base - ha, width: bw, height: Math.max(ha, 0.5), rx: 3, fill:'var(--antes)'}, 'a' + i);
-    ba.style.transition = 'y .9s, height .9s';
-    ba.onmousemove = e => tip(e, `Hoy: ${r.jefes} jefes con ${r.tramo} reportes`); ba.onmouseleave = untip;
-    const bt = nodo(svg, 'rect', {class:'barra', x: x + 1, y: base - ht, width: bw, height: Math.max(ht, 0.5), rx: 3, fill:'var(--despues)', opacity: T ? 1 : 0}, 't' + i);
-    bt.style.transition = 'y .9s, height .9s';
-    bt.onmousemove = e => tip(e, `Propuesta: ${T ? T[i].jefes : 0} jefes con ${r.tramo} reportes`); bt.onmouseleave = untip;
-    nodo(svg, 'text', {x, y: h - 4, 'text-anchor':'middle'}, 'x' + i).textContent = r.tramo;
-    nodo(svg, 'text', {x: x - bw / 2 - 1, y: base - ha - 4, 'text-anchor':'middle', 'font-size':11}, 'va' + i).textContent = r.jefes || '';
-    nodo(svg, 'text', {x: x + bw / 2 + 1, y: base - ht - 4, 'text-anchor':'middle', 'font-size':11, fill:'var(--text)', opacity: T ? 1 : 0}, 'vt' + i).textContent = T && T[i].jefes ? T[i].jefes : '';
+    const x = i * g + g / 2, ha = (base - top) * r.jefes / max, ht = T ? (base - top) * T[i].jefes / max : 0;
+    nodo(svg, 'rect', {class: 'trans', x: x - bw - 1, y: base - ha, width: bw, height: Math.max(ha, .5), rx: 3, fill: css('--hoy')}, 'a' + i).dataset.tip = `<b>Hoy · ${r.tramo} reportes</b>${n0(r.jefes)} jefes`;
+    nodo(svg, 'rect', {class: 'trans', x: x + 1, y: base - ht, width: bw, height: Math.max(ht, .5), rx: 3, fill: css('--propuesta'), opacity: T ? 1 : 0}, 't' + i).dataset.tip = `<b>Propuesta · ${r.tramo} reportes</b>${T ? n0(T[i].jefes) : 0} jefes`;
+    nodo(svg, 'text', {x, y: h - 4, 'text-anchor': 'middle'}, 'x' + i, r.tramo);
+    nodo(svg, 'text', {x: x - bw / 2 - 1, y: base - ha - 4, 'text-anchor': 'middle', 'font-size': 11}, 'va' + i, r.jefes || '');
+    nodo(svg, 'text', {x: x + bw / 2 + 1, y: base - ht - 4, 'text-anchor': 'middle', 'font-size': 11, class: 'v', opacity: T ? 1 : 0}, 'vt' + i, T && T[i].jefes ? T[i].jefes : '');
   });
 }
-
 function modelo(){
-  const cont = $('#modelo');
-  const mod = E.datos.modelo, tobe = E.datos.tobe;
+  const mod = E.datos.modelo, tobe = E.datos.tobe, cont = $('#modelo');
+  let h;
   if (!mod){
-    $('#tituloModelo').textContent = 'Organización actual por área';
-    $('#subModelo').textContent = E.datos.capacidades ? `${E.datos.capacidades.duplicadas.length} capacidades duplicadas` : '';
-    if (!empresa) return;
-    const dup = E.datos.capacidades?.duplicadas || [];
-    const h0 = `<div class="banda"><div class="bloques">${empresa.areas.map(a => `<div class="bloque" style="--c:var(--antes)"><b>${esc(a.area)}</b><span><em>${fmt(a.personas)}</em> personas · ${a.jefaturas} jefaturas</span></div>`).join('')}</div></div>`
-      + (dup.length ? `<div class="banda"><div class="tit" style="color:var(--objecion)">Duplicadas entre unidades</div><div style="font-size:13px;color:var(--text-2)">${dup.map(esc).join(' · ')}</div></div>` : '');
-    if (cont.dataset.html !== h0){ cont.dataset.html = h0; cont.innerHTML = h0; }
-    return;
+    $('#modeloTitle').textContent = 'Esperando al diseñador';
+    h = `<div class="empty">${ico('layers','')}<div class="body-sm">Cuando el diseñador proponga el modelo, aquí aparecen los equipos de producto, las plataformas y los habilitadores, con su tamaño.</div></div>`;
+  } else {
+    const B = Object.fromEntries((tobe?.bloques || []).map(b => [b.nombre, b]));
+    const maxP = Math.max(1, ...(tobe?.bloques || []).map(b => b.personas));
+    $('#modeloTitle').textContent = tobe ? `${tobe.bloques.length} bloques reportan al CEO` : 'Propuesta del diseñador';
+    const banda = (tit, color, lista, det) => `<div class="band"><div class="tit"><i style="background:${color}"></i><span class="overline" style="color:${color}">${tit} · ${lista.length}</span></div><div class="bk-grid">${lista.map(b => {
+      const x = B[b.nombre];
+      return `<div class="bk" style="--c:${color}" data-tip="<b>${esc(b.nombre)}</b>${x ? `${n0(x.personas)} personas · ${x.jefaturas} jefaturas · ${x.capas} capas · ${money(x.costo_musd)}` : esc(det(b))}"><b>${esc(b.nombre)}</b><div class="m">${x ? `${n0(x.personas)} personas · ${x.capas} capas` : esc(det(b))}</div>${x ? `<div class="bar"><i style="width:${Math.max(3, 100 * Math.sqrt(x.personas / maxP))}%"></i></div>` : ''}</div>`;
+    }).join('')}</div></div>`;
+    h = banda('Productos', 'var(--blk-producto)', mod.productos || [], b => (b.categorias || []).join(', '))
+      + banda('Plataformas', 'var(--blk-plataforma)', mod.plataformas || [], b => `${(b.capacidades || []).length} capacidades`)
+      + banda('Habilitadores', 'var(--blk-habilitador)', mod.habilitadores || [], b => `${(b.capacidades || []).length} capacidades`);
   }
-  $('#tituloModelo').textContent = 'Modelo producto-plataforma';
-  const B = Object.fromEntries((tobe?.bloques || []).map(b => [b.nombre, b]));
-  $('#subModelo').textContent = tobe ? `${tobe.bloques.length} bloques reportan al CEO` : 'propuesto';
-  const banda = (titulo, color, lista, det) => `<div class="banda"><div class="tit" style="color:${color}"><i style="background:${color}"></i>${titulo}</div><div class="bloques">${lista.map(b => {
-    const x = B[b.nombre];
-    return `<div class="bloque" style="--c:${color}"><b>${esc(b.nombre)}</b><span>${x ? `<em>${fmt(x.personas)}</em> personas · ${x.capas} capas` : esc(det(b))}</span></div>`;
-  }).join('')}</div></div>`;
-  const html = banda('Productos', 'var(--producto)', mod.productos, b => b.categorias.join(', '))
-    + banda('Plataformas', 'var(--plataforma)', mod.plataformas, b => `${b.capacidades.length} capacidades`)
-    + banda('Habilitadores', 'var(--habilitador)', mod.habilitadores, b => '');
-  if (cont.dataset.html !== html){ cont.dataset.html = html; cont.innerHTML = html; }
+  if (cont.dataset.h !== h){ cont.dataset.h = h; cont.innerHTML = h; }
 }
-
-function kpis(){
-  const a = E.datos.asis, t = E.datos.tobe?.metricas, imp = E.datos.impacto;
-  const filas = [
-    ['Capas', a?.capas, t?.capas, 'menos', ''],
-    ['Tramo promedio', a?.tramo_promedio, t?.tramo_promedio, 'mas', ''],
-    ['Jefaturas', a?.jefaturas, t?.jefaturas, 'menos', ''],
-    ['Jefes con 1 reporte', a?.jefes_un_reporte, t?.jefes_un_reporte, 'menos', ''],
-  ];
-  let html = filas.map(([lbl, x, y, dir]) => {
-    let delta = '';
-    if (x != null && y != null && x !== 0){ const d = (y - x) / x * 100; delta = `${d > 0 ? '+' : ''}${Math.round(d)}%`; }
-    return `<div class="kpi ${y == null ? 'pendiente' : ''}"><div class="lbl">${lbl}</div><div class="val"><span class="antes">${x != null ? fmt(x) : '—'}</span><span class="flecha">→</span><span class="desp">${y != null ? fmt(y) : '?'}</span>${delta ? `<span class="delta">${delta}</span>` : ''}</div></div>`;
-  }).join('');
-  html += `<div class="kpi ancho ${imp ? '' : 'pendiente'}"><div class="lbl">Ahorro anual estimado</div><div class="val"><span class="desp">${imp ? 'USD ' + fmt(imp.ahorro_anual_musd) + ' M' : '?'}</span>${imp ? `<span class="delta">${fmt(imp.ahorro_pct_costo_total)}% del costo de personal</span>` : ''}</div></div>`;
-  html += `<div class="kpi ancho ${imp ? '' : 'pendiente'}"><div class="lbl">Personas de las unidades de negocio a plataformas</div><div class="val"><span class="desp">${imp ? fmt(imp.personas_de_unidades_a_plataformas) : '?'}</span></div></div>`;
-  const k = $('#kpis'); if (k.dataset.html !== html){ k.dataset.html = html; k.innerHTML = html; }
-}
-
 function chro(){
   const v = E.datos.veredicto, r = E.datos.riesgos, hist = E.datos.tobe_historial || [];
-  let html = '';
+  let h = '';
   if (v){
     const ok = v.veredicto === 'APROBADO';
-    html += `<div class="veredicto ${ok ? 'aprobado' : 'objetado'}">${ok ? '✓ APROBADO' : '✋ OBJETADO'}</div>`;
-    const cp = v.cambios_pedidos || [], ob = v.objeciones || [];
-    const items = ok ? cp.map(c => `<li class="ok">${esc(c)}</li>`) : ob.map(o => `<li>${esc(o)}</li>`);
-    html += `<ul>${items.join('')}</ul>`;
-    if (!ok && cp.length) html += `<div style="font-size:12px;color:var(--text-3)">Pide: ${esc(cp.join(' '))}</div>`;
+    h += `<div class="verdict ${ok ? 'ok' : 'no'}">${ico(ok ? 'check' : 'alert', '')}<div><b>${ok ? 'APROBADO' : 'OBJETADO'}</b><div class="caption" style="color:inherit">${ok ? 'Con estas condiciones de implementación' : 'El equipo debe corregir antes del directorio'}</div></div></div>`;
+    const items = ok ? (v.cambios_pedidos || []) : (v.objeciones || []);
+    h += `<div class="list-sig">${items.map(o => `<div class="signal ${ok ? 'ok' : 'bad'}" style="padding:10px 12px"><div class="ic" style="width:24px;height:24px">${ico(ok ? 'check' : 'alert', 'xs')}</div><div class="body-sm">${esc(o)}</div></div>`).join('')}</div>`;
   } else if (r){
-    html += `<ul>${r.hallazgos.map(x => `<li>${esc(x.hallazgo)}</li>`).join('') || '<li class="ok">Sin riesgos en los chequeos</li>'}</ul>`;
+    h += `<div class="list-sig">${(r.hallazgos || []).map(x => `<div class="signal ${x.severidad === 'alta' ? 'bad' : 'warn'}" style="padding:10px 12px"><div class="ic" style="width:24px;height:24px">${ico('alert','xs')}</div><div class="body-sm"><span class="badge ${x.severidad === 'alta' ? 'b-high' : 'b-med'}">${x.severidad}</span> ${esc(x.hallazgo)}</div></div>`).join('') || '<div class="signal ok"><div class="ic">' + ico('check') + '</div><div class="body-sm">Sin riesgos en los chequeos automáticos.</div></div>'}</div>`;
   } else {
-    html += `<div style="color:var(--text-3);font-size:13px">El CHRO revisa el diseño cuando el equipo termina. Puede objetarlo y obligar a una segunda ronda.</div>`;
+    h += `<div class="empty">${ico('check','')}<div class="body-sm">El CHRO revisa el diseño cuando el equipo termina. Puede objetarlo y obligar a una segunda ronda.</div></div>`;
   }
   if (hist.length){
-    html += `<div class="historial" style="margin-top:auto;padding-top:8px;border-top:1px solid var(--border)"><span>Intentos del optimizador</span>${hist.map((x, i) => `<span>#${i + 1} · <b>${x.capas} capas</b> · ${fmt(x.jefaturas)} jefaturas · tramo ${fmt(x.tramo_promedio)}</span>`).join('')}</div>`;
+    const meta = ORG?.meta_capas || 7;
+    h += `<div class="attempts"><span class="overline" style="width:100%">Intentos del optimizador</span>${hist.map((x, i) => `<div class="att ${x.capas > meta ? 'bad' : 'good'}"><span class="caption">#${i + 1}</span><b>${x.capas} capas</b><span>${n0(x.jefaturas)} jefaturas</span></div>`).join('')}</div>`;
   }
-  const c = $('#chro'); if (c.dataset.html !== html){ c.dataset.html = html; c.innerHTML = html; }
+  const c = $('#chro'); if (c.dataset.h !== h){ c.dataset.h = h; c.innerHTML = h; }
 }
 
-const tipEl = $('#tip');
-function tip(e, txt){ tipEl.textContent = txt; tipEl.style.display = 'block'; tipEl.style.left = (e.clientX + 12) + 'px'; tipEl.style.top = (e.clientY + 12) + 'px'; }
-function untip(){ tipEl.style.display = 'none'; }
+// ============================================================================ VISTA 3: cómo funciona
+function vistaHow(){
+  if (!CFG || $('#agCards').dataset.ok) return;
+  $('#agCards').dataset.ok = 1;
+  $('#stack').innerHTML = [`Claude · ${CFG.agentes[0].modelo}`, 'Python + FastAPI', 'Transmisión en vivo (SSE)', 'Render', 'Construido con Claude Code']
+    .map(t => `<span class="chip">${esc(t)}</span>`).join('');
+  const pill = id => { const a = CFG.agentes.find(x => x.id === id);
+    return `<div class="ag" data-cfg="${id}" title="Ver configuración"><span class="avatar av-32" style="background:${AG_COLOR(id)};width:26px;height:26px;font-size:10px">${INICIALES[id]}</span>${esc(a.nombre)}</div>`; };
+  const flecha = `<svg class="ico sm" style="color:var(--prizm-neutral-60)"><use href="#i-arrow"/></svg>`;
+  $('#lane').innerHTML = `<div class="par">${pill('diagnostico')}${pill('capacidades')}</div>${flecha}${pill('disenador')}${flecha}${pill('optimizador')}${flecha}${pill('impacto')}${flecha}${pill('chro')}
+    <span class="loop">${ico('loop','xs')}Si objeta: ronda 2 desde el diseñador</span>`;
+  $('#agCards').innerHTML = CFG.agentes.map(a => `<div class="agc" style="--agc:${AG_COLOR(a.id)}">
+    <div style="display:flex;gap:10px;align-items:center"><div class="avatar av-40" style="background:${AG_COLOR(a.id)}">${INICIALES[a.id]}</div><div><div class="title-md">${esc(a.nombre)}</div><div class="caption">${esc(a.rol)}</div></div></div>
+    <div class="body-sm muted">${esc(a.calcula_el_codigo)}</div>
+    <div class="meta"><span class="badge b-period">${esc(a.fase)}</span><span class="badge b-info">${a.herramientas.length} herramienta${a.herramientas.length > 1 ? 's' : ''}</span></div>
+    <div><button class="btn btn-tonal sm" data-cfg="${a.id}">${ico('code')}Ver configuración</button></div></div>`).join('');
+  $('#caso').textContent = CFG.caso;
+  const R = CFG.reglas_por_defecto, T = R.tramo_primera_linea;
+  $('#reglas').innerHTML = `<table class="dt"><thead><tr><th>Regla</th><th>Valor</th></tr></thead><tbody>
+    ${Object.entries(T).map(([k, v]) => `<tr><td>Supervisor de trabajo ${esc(TIPO_ES[k].toLowerCase())}</td><td>${v} reportes</td></tr>`).join('')}
+    <tr><td>Jefe de jefes</td><td>${R.tramo_gerencial} reportes</td></tr>
+    <tr><td>Líder de bloque antes de crear una capa de dirección</td><td>${R.tramo_lider_bloque} reportes</td></tr>
+    <tr><td>Máximo de capas (meta del CEO)</td><td>${R.capas_max}</td></tr></tbody></table>
+    <div class="caption" style="margin-top:8px">El optimizador parte de estas reglas y las ajusta; el CHRO objeta si se salen de lo seguro.</div>`;
+}
 
+// ============================================================================ modal de agente
+let mAgente = null, mTab = 'inst';
+function abrirAgente(id){
+  if (!CFG) return;
+  mAgente = CFG.agentes.find(a => a.id === id); mTab = 'inst';
+  $('#mAv').style.background = AG_COLOR(id); $('#mAv').textContent = INICIALES[id];
+  $('#mTitle').textContent = mAgente.nombre; $('#mRol').textContent = mAgente.rol;
+  $('#mMeta').innerHTML = `<span class="chip">${ico('spark','xs')}${esc(mAgente.modelo)}</span><span class="chip">${esc(mAgente.fase)}</span><span class="chip">Debe llamar a <span class="mono">${esc(mAgente.herramienta_obligatoria)}</span></span>`;
+  pintarModal(); $('#mAgente').classList.add('on');
+}
+$('#mTabs').addEventListener('click', e => { const t = e.target.closest('[data-mt]'); if (t){ mTab = t.dataset.mt; pintarModal(); } });
+function pintarModal(){
+  if (!mAgente) return;
+  $$('#mTabs .tab').forEach(t => t.classList.toggle('on', t.dataset.mt === mTab));
+  const a = mAgente; let h = '';
+  if (mTab === 'inst'){
+    h = `<div class="overline" style="margin-bottom:6px">Instrucciones de sistema (system prompt)</div><div class="codebox">${esc(a.instrucciones)}</div>
+      <div class="note" style="margin-top:12px"><b>Por qué importa ·</b> estas instrucciones son el "manual de puesto" del agente. Cambiarlas cambia su comportamiento sin tocar el código del motor.</div>`;
+  } else if (mTab === 'herr'){
+    h = a.herramientas.map(t => `<div class="tool-card"><div class="nm"><span class="mono" style="font-size:13px;color:var(--prizm-primary-40);font-weight:500">${esc(t.nombre)}</span>${t.nombre === a.herramienta_obligatoria ? '<span class="badge b-por">Obligatoria</span>' : ''}</div>
+      <div class="body-sm muted">${esc(t.descripcion)}</div>
+      ${t.parametros.length ? `<table class="params">${t.parametros.map(p => `<tr><td>${esc(p.nombre)}</td><td class="caption">${esc(p.tipo)}${p.requerido ? ' · requerido' : ''}</td><td class="body-sm">${esc(p.descripcion)}${p.opciones ? `<div class="caption">Opciones: ${esc(p.opciones.join(', '))}</div>` : ''}</td></tr>`).join('')}</table>` : '<div class="caption" style="margin-top:6px">Sin parámetros: el motor ya tiene los datos.</div>'}</div>`).join('')
+      + `<div class="note"><b>Lo que hace el código ·</b> ${esc(a.calcula_el_codigo)}</div>`;
+  } else if (mTab === 'io'){
+    h = `<div class="io"><div class="box"><div class="overline">Recibe</div><div class="body-sm" style="margin-top:6px">${esc(a.recibe)}</div></div>
+      <div class="box"><div class="overline">Publica en la pantalla</div><ul style="list-style:none;margin-top:6px;display:flex;flex-direction:column;gap:6px">${a.publica.map(p => `<li class="body-sm">${ico('monitor','xs')} ${esc(p)}</li>`).join('')}</ul></div></div>
+      <div class="overline" style="margin:16px 0 6px">Estilo común a todos los agentes</div><div class="codebox">${esc(CFG.estilo_comun)}</div>`;
+  } else {
+    const st = E?.agentes?.[a.id];
+    if (!st || (!st.texto && !st.herramientas.length)) h = `<div class="empty">${ico('brainc','')}<div class="body-sm">Este agente todavía no trabaja en esta corrida.</div></div>`;
+    else h = `<div class="overline" style="margin-bottom:6px">Herramientas que llamó</div>${st.herramientas.map((x, i) => `<div class="signal info" style="padding:8px 12px;margin-bottom:6px"><div class="ic" style="width:24px;height:24px">${ico('zap','xs')}</div><div><span class="mono">${esc(x.herramienta)}</span><div class="caption">${esc(x.resumen)}</div></div></div>`).join('') || '<div class="caption">Ninguna todavía.</div>'}
+      <div class="overline" style="margin:14px 0 6px">Lo que escribió</div><div class="codebox" style="font-family:var(--rgmx-font-sans);font-size:13px">${esc(st.texto.trim()) || '—'}</div>`;
+  }
+  $('#mBody').innerHTML = h;
+}
+
+// ============================================================================ render general
+let pendiente = false;
+function render(){ if (!pendiente){ pendiente = true; requestAnimationFrame(() => { pendiente = false; dibujar(); }); } }
+function dibujar(){
+  if (!E) return;
+  const c = E.corrida, corriendo = c.estado === 'corriendo';
+  document.getElementById('app').classList.toggle('running', corriendo);
+  const rb = $('#runBadge');
+  if (corriendo){ rb.className = 'badge b-live'; rb.innerHTML = `<span class="pulse"></span>${c.modo === 'vivo' ? 'En vivo' : c.modo === 'guion' ? 'Guion' : 'Grabación'} · ${esc(c.fase)}`; }
+  else if (c.estado === 'terminada'){ rb.className = 'badge b-ok'; rb.textContent = c.fase; }
+  else if (c.estado === 'error'){ rb.className = 'badge b-high'; rb.textContent = c.fase; }
+  else { rb.className = 'badge b-draft'; rb.textContent = 'En espera'; }
+  const ult = E.bitacora[E.bitacora.length - 1];
+  $('#ticker').textContent = ult ? (ult.agente ? `${E.agentes[ult.agente]?.nombre} · ` : '') + ult.texto : 'Lista para empezar';
+  $('#dlProp').style.display = E.datos.tobe ? '' : 'none';
+  $$('.acciones [data-modo]').forEach(b => b.disabled = corriendo || (b.id === 'bVivo' && empresa && !empresa.vivo_disponible));
+  if (vista === 'org') vistaOrg();
+  if (vista === 'run') vistaRun();
+  if (vista === 'how') vistaHow();
+  if ($('#mAgente').classList.contains('on') && mTab === 'run') pintarModal();
+}
 setInterval(() => {
-  if (!E || !E.corrida.inicio) { $('#reloj').textContent = '0:00'; return; }
+  if (!E || !E.corrida.inicio){ $('#reloj').textContent = '0:00'; return; }
   const fin = E.corrida.estado === 'corriendo' ? Date.now() / 1000 : (E.corrida.fin || Date.now() / 1000);
   const s = Math.max(0, Math.round(fin - E.corrida.inicio));
   $('#reloj').textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }, 500);
-window.addEventListener('resize', render);
+window.addEventListener('resize', () => { $$('[data-h]').forEach(x => delete x.dataset.h); render(); });
 
-// ------------------------------------------------------------------ conexión
+// ============================================================================ conexión en vivo
 function conectar(){
   const es = new EventSource('/api/eventos');
-  es.addEventListener('snapshot', e => { E = JSON.parse(e.data); render(); });
+  es.addEventListener('snapshot', e => { E = JSON.parse(e.data); if (E.corrida.estado !== 'lista' && vista === 'org' && !irA._manual) irA('run'); render(); });
   es.onmessage = e => { if (!E) return; aplicar(JSON.parse(e.data)); render(); };
-  es.onerror = () => { $('#fase').textContent = 'Reconectando…'; };
+  es.onerror = () => { $('#ticker').textContent = 'Reconectando…'; };
 }
 
-// ------------------------------------------------------------------ controles del presentador
+// ============================================================================ controles del presentador
 async function post(url){
   const r = await fetch(url + (url.includes('?') ? '&' : '?') + 'token=' + encodeURIComponent(TOKEN), {method:'POST'});
   if (!r.ok){ const d = await r.json().catch(() => ({})); alert(d.detail || 'Error'); }
 }
-document.querySelectorAll('.controles button[data-modo]').forEach(b => b.onclick = () => post('/api/correr?modo=' + b.dataset.modo));
+$$('.acciones [data-modo]').forEach(b => b.onclick = () => { irA('run'); post('/api/correr?modo=' + b.dataset.modo); });
 $('#bReiniciar').onclick = () => post('/api/reiniciar');
 $('#bQR').onclick = () => {
   const url = location.origin + '/';
   $('#qrurl').textContent = url.replace(/^https?:\/\//, '');
-  const q = $('#qr'); q.style.display = 'grid'; q.onclick = () => q.style.display = 'none';
-  if (window.qrcode){ const c = qrcode(0, 'M'); c.addData(url); c.make(); $('#qrcode').innerHTML = c.createSvgTag({cellSize: 8, margin: 2}); }
+  $('#qr').classList.add('on');
+  if (window.qrcode){ const q = qrcode(0, 'M'); q.addData(url); q.make(); $('#qrcode').innerHTML = q.createSvgTag({cellSize: 8, margin: 2}); }
 };
+$$('.tab[data-view], .rail .it[data-view]').forEach(b => b.addEventListener('click', () => { irA._manual = true; }));
 
 (async () => {
-  empresa = await fetch('/api/empresa').then(r => r.json());
-  $('#empresa').textContent = `${empresa.nombre} · ${empresa.nota.toLowerCase()} · ${fmt(empresa.personas)} personas`;
+  [empresa, ORG, CFG] = await Promise.all(['/api/empresa', '/api/organizacion', '/api/agentes'].map(u => fetch(u).then(r => r.json())));
+  $('#sbInfo').textContent = `${n0(empresa.personas)} posiciones · empresa ficticia con datos sintéticos`;
   if (TOKEN){
-    if (!empresa.vivo_disponible){ const b = $('#bVivo'); b.title = 'Falta ANTHROPIC_API_KEY en el servidor'; b.textContent = '▶ En vivo (sin clave)'; }
-    if (!empresa.grabacion_disponible) $('#bGrab').title = 'Aún no hay grabación: usará el guion';
+    if (!empresa.vivo_disponible){ const b = $('#bVivo'); b.disabled = true; b.title = 'Falta ANTHROPIC_API_KEY en el servidor'; }
+    if (!empresa.grabacion_disponible) $('#bGrab').title = 'Todavía no hay grabación: usará el guion de respaldo';
     const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'; document.head.appendChild(s);
-  }
-  if (!E){ E = estadoInicial(); }
+  } else { $('#bQR').style.display = 'none'; }
+  if (!E) E = estadoInicial();
   render();
   conectar();
 })();

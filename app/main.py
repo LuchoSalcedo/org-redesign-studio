@@ -59,6 +59,16 @@ async def empresa():
             "grabacion_disponible": agentes.ultima_grabacion() is not None}
 
 
+@app.get("/api/organizacion")
+async def organizacion():
+    return motor.organizacion_actual()
+
+
+@app.get("/api/agentes")
+async def agentes_config():
+    return agentes.configuracion_agentes()
+
+
 @app.get("/api/estado")
 async def estado():
     return JSONResponse(bus.snapshot(), headers={"Cache-Control": "no-store"})

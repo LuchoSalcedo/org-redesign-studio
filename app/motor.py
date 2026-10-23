@@ -501,3 +501,51 @@ def resumen_asis_por_area() -> list[dict]:
     c = Counter(p["area"] for p in org)
     j = Counter(p["area"] for p in org if p["id"] in hijos)
     return [{"area": a, "personas": n, "jefaturas": j[a]} for a, n in c.most_common() if a != "Dirección General"]
+
+
+# --------------------------------------------------------------------------- vista "organización actual"
+GRUPOS_AREA = {
+    "Supply Chain": "Supply Chain",
+    "Ventas Canal Tradicional": "Fuerza de ventas",
+    "BU Alimentos": "Unidades de negocio", "BU Bebidas": "Unidades de negocio",
+    "BU Cuidado del Hogar": "Unidades de negocio",
+}
+ORDEN_GRUPOS = ["Supply Chain", "Fuerza de ventas", "Unidades de negocio", "Funciones corporativas"]
+
+
+def organizacion_actual() -> dict:
+    """Todo lo que muestra la vista previa a la corrida: KPIs, pirámide por grupo, focos y duplicaciones."""
+    org = cargar_asis()
+    por_id, hijos, capa = _indices(org)
+    d = diagnostico()
+    grupo = lambda p: GRUPOS_AREA.get(p["area"], "Funciones corporativas")
+    piramide = defaultdict(Counter)
+    for p in org:
+        piramide[capa[p["id"]]][grupo(p)] += 1
+    costo_area = defaultdict(float)
+    for p in org:
+        costo_area[p["area"]] += p["costo_anual_usd"]
+    for f in d["focos_por_area"]:
+        f["grupo"] = GRUPOS_AREA.get(f["area"], "Funciones corporativas")
+        f["costo_musd"] = round(costo_area[f["area"]] / 1e6, 1)
+        f["pct_jefaturas"] = round(100 * f["jefaturas"] / f["personas"], 1)
+    areas = [f["area"] for f in sorted(d["focos_por_area"], key=lambda f: -f["personas"])]
+    caps = mapa_capacidades()
+    conteo = Counter((p["capacidad"], p["area"]) for p in org if p["capacidad"] != "direccion")
+    matriz = [{"capacidad": c["nombre"], "clave": c["capacidad"], "duplicada": c["duplicada"],
+               "celdas": [conteo.get((c["capacidad"], a), 0) for a in areas]}
+              for c in caps["capacidades"]]
+    tipos = Counter(p["tipo_trabajo"] for p in org if p["id"] not in hijos and p["capacidad"] != "direccion")
+    return {
+        "empresa": "Consumo Andino S.A.A.",
+        "metricas": {k: v for k, v in d.items() if k not in ("focos_por_area", "ejemplos_cadenas_un_reporte")},
+        "meta_capas": REGLAS_POR_DEFECTO["capas_max"],
+        "grupos": ORDEN_GRUPOS,
+        "piramide_por_grupo": [{"capa": c, **{g: piramide[c].get(g, 0) for g in ORDEN_GRUPOS}} for c in sorted(piramide)],
+        "focos_por_area": sorted(d["focos_por_area"], key=lambda f: -f["personas"]),
+        "ejemplos_cadenas_un_reporte": d["ejemplos_cadenas_un_reporte"],
+        "areas_matriz": areas,
+        "matriz_capacidades": matriz,
+        "duplicadas": caps["duplicadas"],
+        "contribuidores_por_tipo": [{"tipo": t, "personas": tipos.get(t, 0)} for t in TIPOS_TRABAJO],
+    }

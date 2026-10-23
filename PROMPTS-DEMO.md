@@ -12,16 +12,18 @@ servidor no se reinicia y el cambio aparece con los datos que la sala ya vio.
 ## Cambio 1 (seguro, ~1 minuto): el costo de cada bloque
 
 ```
-En la vista del modelo producto-plataforma, agrega debajo de las personas de cada bloque su costo
-anual en USD millones (ya viene en tobe.bloques como costo_musd). Después corre python3 -m app.prueba.
+En la vista del modelo producto-plataforma, agrega junto a las personas de cada bloque (en la misma
+línea) su costo anual en USD millones (ya viene en tobe.bloques como costo_musd). La vista del
+rediseño debe seguir cabiendo en una sola pantalla. Después corre python3 -m app.prueba.
 ```
 
 ## Cambio 2 (~2 minutos): un indicador que pide la sala
 
 ```
-Agrega un indicador "Costo de jefaturas" en la columna de KPIs, con el formato de los demás:
-hoy → propuesta en USD millones y el % de cambio. Los datos están en asis.costo_jefaturas_musd y
-tobe.metricas.costo_jefaturas_musd. Después corre python3 -m app.prueba.
+Agrega un indicador "Costo de jefaturas" en la franja de KPIs del rediseño, con el formato de los
+demás: hoy → propuesta en USD millones y el % de cambio. Los datos están en asis.costo_jefaturas_musd
+y tobe.metricas.costo_jefaturas_musd. La franja debe seguir en una sola fila (pasa de 5 a 6
+columnas). Después corre python3 -m app.prueba.
 ```
 
 ## Cambio 3 (solo si lo ensayaste, ~5 minutos): una regla nueva del CHRO

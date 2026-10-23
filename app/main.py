@@ -31,7 +31,7 @@ if os.path.exists(_env):
 from fastapi import FastAPI, HTTPException, Query  # noqa: E402
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse  # noqa: E402
 
-from app import agentes, motor  # noqa: E402
+from app import agentes, empresas, motor  # noqa: E402
 from app.bus import AGENTES, Bus  # noqa: E402
 ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "demo")
 
@@ -50,23 +50,44 @@ async def index():
     return FileResponse(os.path.join(RAIZ, "static", "index.html"), headers={"Cache-Control": "no-store"})
 
 
+def _activa() -> empresas.Empresa:
+    return empresas.get(bus.estado.get("empresa"))
+
+
+def _ficha(e: empresas.Empresa) -> dict:
+    return {"id": e.id, "nombre": e.nombre, "corto": e.corto, "iniciales": e.iniciales, "pais": e.pais,
+            "sector": e.sector, "descripcion": e.descripcion, "personas": len(motor.cargar_asis(e)),
+            "grabacion_disponible": agentes.ultima_grabacion(e.id) is not None}
+
+
 @app.get("/api/empresa")
-async def empresa():
-    org = motor.cargar_asis()
-    return {"nombre": "Consumo Andino S.A.A.", "nota": "Empresa ficticia con datos sintéticos",
-            "personas": len(org), "areas": motor.resumen_asis_por_area(), "agentes": AGENTES,
+async def empresa(empresa: str = Query("")):
+    e = empresas.get(empresa) if empresa else _activa()
+    return {**_ficha(e), "nota": "Empresa ficticia con datos sintéticos", "agentes": AGENTES,
+            "areas": motor.resumen_asis_por_area(e),
             "vivo_disponible": bool(os.environ.get("ANTHROPIC_API_KEY")),
-            "grabacion_disponible": agentes.ultima_grabacion() is not None}
+            "empresas": [_ficha(empresas.get(i)) for i in empresas.ORDEN]}
 
 
 @app.get("/api/organizacion")
-async def organizacion():
-    return motor.organizacion_actual()
+async def organizacion(empresa: str = Query("")):
+    return motor.organizacion_actual(empresas.get(empresa) if empresa else _activa())
 
 
 @app.get("/api/agentes")
-async def agentes_config():
-    return agentes.configuracion_agentes()
+async def agentes_config(empresa: str = Query("")):
+    return agentes.configuracion_agentes(empresas.get(empresa) if empresa else _activa())
+
+
+@app.post("/api/seleccionar")
+async def seleccionar(empresa: str = Query(...), token: str = Query("")):
+    _check(token)
+    if empresa not in empresas.EMPRESAS:
+        raise HTTPException(status_code=400, detail="Empresa desconocida")
+    if tarea and not tarea.done():
+        raise HTTPException(status_code=409, detail="Hay una corrida en curso: reinicia antes de cambiar de empresa")
+    await bus.emit({"type": "empresa", "empresa": empresa})
+    return {"ok": True, "empresa": empresa}
 
 
 @app.get("/api/estado")
@@ -125,13 +146,14 @@ async def reiniciar(token: str = Query("")):
 
 @app.get("/api/descargar/{cual}.csv")
 async def descargar(cual: str):
+    e = _activa()
     if cual == "actual":
-        filas = motor.cargar_asis()
+        filas = motor.cargar_asis(e)
     elif cual == "propuesta":
         s = bus.snapshot()
         if "modelo" not in s["datos"] or "tobe" not in s["datos"]:
             raise HTTPException(status_code=404, detail="Todavía no hay propuesta")
-        r = motor.disenar_org(s["datos"]["modelo"], s["datos"]["tobe"]["reglas"])
+        r = motor.disenar_org(e, s["datos"]["modelo"], s["datos"]["tobe"]["reglas"])
         filas = [{k: p.get(k) for k in ("id", "jefe_id", "cargo", "rol", "bloque", "equipo", "tipo_trabajo",
                                         "persona_id", "area_actual", "costo_anual_usd")} for p in r["_org"]]
     else:
@@ -141,4 +163,4 @@ async def descargar(cual: str):
     w.writeheader()
     w.writerows(filas)
     return StreamingResponse(iter(["﻿" + buf.getvalue()]), media_type="text/csv",
-                             headers={"Content-Disposition": f'attachment; filename="organigrama-{cual}.csv"'})
+                             headers={"Content-Disposition": f'attachment; filename="organigrama-{e.id}-{cual}.csv"'})

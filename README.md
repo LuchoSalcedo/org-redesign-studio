@@ -1,16 +1,25 @@
 # Org Redesign Studio
 
-Seis agentes de IA rediseñan en vivo la organización de **Consumo Andino S.A.A.**, una
-empresa ficticia de consumo masivo peruana con 3,744 personas: pasan de 10 a 7 capas,
-suben los tramos de control y la reorganizan en un modelo producto-plataforma. Un CHRO
-escéptico revisa el diseño y lo objeta; el equipo corrige en una segunda ronda.
+Seis agentes de IA rediseñan en vivo la organización de una empresa ficticia: la bajan de
+10 capas a 7 o menos, suben los tramos de control y la reorganizan en un modelo
+producto-plataforma. Un CHRO escéptico revisa el diseño y lo objeta; el equipo corrige en
+una segunda ronda. El presentador elige una de cuatro empresas (todas con datos sintéticos):
+
+| Empresa | Sector · país | Personas |
+|---|---|---|
+| Consumo Andino S.A.A. | Consumo masivo · Perú | 3,744 |
+| Banco Cumbre | Banca enfocada en empresas · México | 2,140 |
+| Tiendas Esquina | Tiendas de conveniencia · México | 3,813 |
+| Cóndor Telecom | Telecomunicaciones · Colombia | 2,751 |
 
 - **Vista del público:** `https://<tu-app>/` — cualquiera la sigue en vivo desde el celular.
 - **Vista del presentador:** `https://<tu-app>/?admin=<ADMIN_TOKEN>` — muestra los botones. Al cargar,
   la clave se borra de la barra de direcciones, pero usa una clave larga (no `demo`): con ella
   cualquiera podría reiniciar la corrida.
-- **Pantalla recomendada:** 1920×1080 en pantalla completa. En pantallas más chicas funciona, con
-  menos texto visible en las tarjetas de los agentes.
+- **Pantalla recomendada:** 1920×1080 en pantalla completa. La vista del rediseño cabe en una sola
+  pantalla desde 1280×720; en pantallas bajas algunas tarjetas muestran menos texto.
+- **Cambiar de empresa:** en la vista "Organización actual", haz clic en otra empresa (solo el
+  presentador). Todas las pantallas conectadas cambian con él. No se puede cambiar durante una corrida.
 
 ## Correr en tu laptop (10 minutos)
 

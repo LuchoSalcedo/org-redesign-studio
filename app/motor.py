@@ -1,6 +1,6 @@
 """Motor de cálculo del rediseño organizacional.
 
-Todo lo que es aritmética sobre las ~3,300 personas vive aquí y es determinístico:
+Todo lo que es aritmética sobre las personas de cada empresa vive aquí y es determinístico:
 los agentes deciden el diseño y llaman a estas funciones como herramientas, así los
 números siempre cuadran y se calculan en milisegundos.
 
@@ -18,21 +18,11 @@ import math
 import os
 from collections import Counter, defaultdict
 
+from app import generar_org as G
+from app.empresas import Empresa
+
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-CAPACIDADES = {
-    "manufactura": "Manufactura", "mantenimiento": "Mantenimiento", "calidad": "Calidad",
-    "logistica": "Logística", "compras": "Compras", "planeamiento_suministro": "Planeamiento de suministro",
-    "planeamiento_demanda": "Planeamiento de demanda", "ventas_tradicional": "Ventas canal tradicional",
-    "ventas_moderno": "Ventas canal moderno (key accounts)", "trade_marketing": "Trade marketing",
-    "pricing_rgm": "Pricing y RGM", "analytics": "Analytics e inteligencia comercial",
-    "digital_ecommerce": "Digital y e-commerce", "marketing_marca": "Marketing de marca",
-    "innovacion": "Innovación e I+D", "category_management": "Category management",
-    "finanzas": "Finanzas", "rrhh": "Gestión humana", "ti": "Tecnología", "legal": "Legal y asuntos corporativos",
-}
-# Capacidades que viven en los equipos de PRODUCTO (se reparten por categoría)
-CAPACIDADES_PRODUCTO = {"marketing_marca", "innovacion", "category_management"}
-CATEGORIAS = ["Galletas", "Pastas y Harinas", "Salsas y Condimentos", "Bebidas", "Cuidado del Hogar"]
 TIPOS_TRABAJO = ["operativo", "comercial_campo", "profesional", "especialista"]
 
 REGLAS_POR_DEFECTO = {
@@ -43,7 +33,7 @@ REGLAS_POR_DEFECTO = {
     "tamano_minimo_equipo": 4,   # equipos más chicos se fusionan con otros del mismo bloque
 }
 
-# Costo anual cargado (USD) de las posiciones de jefatura del diseño objetivo
+# Costo anual cargado (USD) de las posiciones de jefatura del diseño objetivo (se escala por empresa)
 COSTO_JEFE = {
     "ceo": 480_000, "lider_bloque": 230_000, "director": 150_000, "jefe_equipo": 120_000,
     ("nivel2", "operativo"): 52_000, ("nivel2", "comercial_campo"): 52_000,
@@ -52,19 +42,17 @@ COSTO_JEFE = {
     ("nivel1", "profesional"): 52_000, ("nivel1", "especialista"): 52_000,
 }
 
-_ASIS: list[dict] | None = None
+_ASIS: dict[str, list[dict]] = {}
 
 
-def cargar_asis() -> list[dict]:
-    global _ASIS
-    if _ASIS is None:
-        ruta = os.path.join(RAIZ, "data", "org_asis.json")
+def cargar_asis(e: Empresa) -> list[dict]:
+    if e.id not in _ASIS:
+        ruta = G.ruta_datos(e.id)
         if not os.path.exists(ruta):
-            from app.generar_org import main as generar
-            generar()
+            G.generar(e.id)
         with open(ruta, encoding="utf-8") as f:
-            _ASIS = json.load(f)
-    return _ASIS
+            _ASIS[e.id] = json.load(f)
+    return _ASIS[e.id]
 
 
 # --------------------------------------------------------------------------- métricas
@@ -125,9 +113,9 @@ def metricas(org: list[dict]) -> dict:
 
 
 # --------------------------------------------------------------------------- diagnóstico
-def diagnostico() -> dict:
+def diagnostico(e: Empresa) -> dict:
     """Span & layers de la organización actual, con los focos por área."""
-    org = cargar_asis()
+    org = cargar_asis(e)
     por_id, hijos, capa = _indices(org)
     m = metricas(org)
     focos = []
@@ -162,16 +150,16 @@ def diagnostico() -> dict:
     return m
 
 
-def mapa_capacidades() -> dict:
+def mapa_capacidades(e: Empresa) -> dict:
     """Dónde vive cada capacidad hoy y cuáles están duplicadas entre unidades."""
-    org = cargar_asis()
+    org = cargar_asis(e)
     _, hijos, _ = _indices(org)
     resumen = {}
     for p in org:
         c = p["capacidad"]
         if c == "direccion":
             continue
-        r = resumen.setdefault(c, {"capacidad": c, "nombre": CAPACIDADES[c], "personas": 0, "jefaturas": 0,
+        r = resumen.setdefault(c, {"capacidad": c, "nombre": e.capacidades[c], "personas": 0, "jefaturas": 0,
                                    "areas": set(), "categorias": set()})
         r["personas"] += 1
         r["jefaturas"] += 1 if p["id"] in hijos else 0
@@ -186,21 +174,21 @@ def mapa_capacidades() -> dict:
     direccion = sum(1 for p in org if p["capacidad"] == "direccion")
     return {
         "posiciones_de_direccion": direccion,
-        "nota_direccion": f"{direccion} posiciones de dirección (CEO, VPs, gerentes generales y comerciales) no tienen "
+        "nota_direccion": f"{direccion} posiciones de dirección (CEO, vicepresidentes, directores de unidad y gerentes comerciales) no tienen "
                           f"capacidad asignada: se rediseñan como líderes de bloque. Con ellas se suman las "
                           f"{len(org):,} personas.",
         "capacidades": filas,
         "duplicadas": [r["nombre"] for r in filas if r["duplicada"]],
-        "capacidades_de_producto": sorted(CAPACIDADES_PRODUCTO),
-        "categorias": CATEGORIAS,
-        "nota": "Las capacidades de producto (marketing de marca, innovación, category management) se reparten "
-                "por categoría entre los equipos de producto; las demás se asignan completas a una plataforma o "
-                "habilitador.",
+        "capacidades_de_producto": sorted(e.cap_producto),
+        "categorias": e.categorias,
+        "nota": f"Las capacidades de producto ({', '.join(e.capacidades[c].lower() for c in sorted(e.cap_producto))}) "
+                f"se reparten por {e.etiqueta_categoria} entre los equipos de producto; las demás se asignan completas "
+                f"a una plataforma o habilitador.",
     }
 
 
 # --------------------------------------------------------------------------- modelo objetivo
-def validar_modelo(modelo: dict) -> list[str]:
+def validar_modelo(e: Empresa, modelo: dict) -> list[str]:
     if not isinstance(modelo, dict):
         return ["El modelo debe ser un objeto con productos, plataformas y habilitadores"]
     for clave in ("productos", "plataformas", "habilitadores"):
@@ -212,26 +200,26 @@ def validar_modelo(modelo: dict) -> list[str]:
     asignadas = Counter()
     for bloque in (modelo.get("plataformas") or []) + (modelo.get("habilitadores") or []):
         for c in bloque.get("capacidades") or []:
-            if c not in CAPACIDADES:
+            if c not in e.capacidades:
                 errores.append(f'Capacidad desconocida "{c}" en {bloque.get("nombre")}')
             asignadas[c] += 1
     for c, n in asignadas.items():
         if n > 1:
             errores.append(f'La capacidad "{c}" está asignada a {n} bloques; debe estar en uno solo')
-        if c in CAPACIDADES_PRODUCTO:
+        if c in e.cap_producto:
             errores.append(f'"{c}" es una capacidad de producto: va en los equipos de producto, no en una plataforma')
-    for c in CAPACIDADES:
-        if c not in CAPACIDADES_PRODUCTO and c not in asignadas:
+    for c in e.capacidades:
+        if c not in e.cap_producto and c not in asignadas:
             errores.append(f'Falta asignar la capacidad "{c}" a una plataforma o habilitador')
     cats = Counter(cat for prod in modelo.get("productos") or [] for cat in prod.get("categorias") or [])
-    for cat in CATEGORIAS:
+    for cat in e.categorias:
         if cats[cat] == 0:
-            errores.append(f'La categoría "{cat}" no tiene equipo de producto')
+            errores.append(f'La {e.etiqueta_categoria} "{cat}" no tiene equipo de producto')
         elif cats[cat] > 1:
-            errores.append(f'La categoría "{cat}" está en más de un equipo de producto')
+            errores.append(f'La {e.etiqueta_categoria} "{cat}" está en más de un equipo de producto')
     for cat in cats:
-        if cat not in CATEGORIAS:
-            errores.append(f'Categoría desconocida "{cat}"')
+        if cat not in e.categorias:
+            errores.append(f'{e.etiqueta_categoria.capitalize()} desconocida "{cat}"')
     if not modelo.get("productos"):
         errores.append("El modelo necesita al menos un equipo de producto")
     return errores
@@ -259,17 +247,18 @@ def _reglas(reglas: dict | None) -> dict:
     return r
 
 
-def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
+def disenar_org(e: Empresa, modelo: dict, reglas: dict | None = None) -> dict:
     """Construye el organigrama objetivo desde la base.
 
     Conserva a todos los contribuidores individuales, los agrupa en equipos según el
     modelo producto-plataforma y crea las jefaturas necesarias según los tramos.
     """
-    errores = validar_modelo(modelo)
+    errores = validar_modelo(e, modelo)
     if errores:
         return {"ok": False, "errores": errores}
     R = _reglas(reglas)
-    asis = cargar_asis()
+    asis = cargar_asis(e)
+    costo_jefe = lambda k: round(COSTO_JEFE[k] * e.factor_costo, -2)
     _, hijos_asis, _ = _indices(asis)
     ics = [p for p in asis if p["id"] not in hijos_asis and p["capacidad"] != "direccion"]
 
@@ -287,15 +276,15 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
     # 1. Asignar cada IC a un bloque y a un equipo
     equipos: dict = defaultdict(list)
     for p in ics:
-        if p["capacidad"] in CAPACIDADES_PRODUCTO:
+        if p["capacidad"] in e.cap_producto:
             b = bloque_de_cat[p["categoria"]]
             clave = (b, p["categoria"])
         else:
             b = bloque_de_cap[p["capacidad"]]
             if p["tipo_trabajo"] in ("operativo", "comercial_campo"):
-                clave = (b, f'{CAPACIDADES[p["capacidad"]]} – {p["ubicacion"]}')
+                clave = (b, f'{e.capacidades[p["capacidad"]]} – {p["ubicacion"]}')
             else:
-                clave = (b, CAPACIDADES[p["capacidad"]])
+                clave = (b, e.capacidades[p["capacidad"]])
         equipos[clave].append(p)
 
     # 2. Fusionar equipos demasiado chicos dentro de su bloque
@@ -331,13 +320,13 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
                     "bloque": bloque, "equipo": equipo, "tipo_trabajo": tipo, "persona_id": None})
         return nuevo_id[0]
 
-    ceo = nueva_pos(None, "CEO", "ceo", COSTO_JEFE["ceo"], "Dirección General", "Dirección General", "gerencial")
+    ceo = nueva_pos(None, "CEO", "ceo", costo_jefe("ceo"), "Dirección General", "Dirección General", "gerencial")
     resumen_bloques = []
     for b in bloques:
         lista = por_bloque.get(b["nombre"], [])
         if not lista:
             continue
-        lider = nueva_pos(ceo, f'Líder de {b["nombre"]}', "lider_bloque", COSTO_JEFE["lider_bloque"], b["nombre"],
+        lider = nueva_pos(ceo, f'Líder de {b["nombre"]}', "lider_bloque", costo_jefe("lider_bloque"), b["nombre"],
                           b["nombre"], "gerencial")
         lista.sort(key=lambda e: e[0])
         # capa de dirección si el líder tendría demasiados reportes
@@ -351,7 +340,7 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
                 if not trozo:
                     continue
                 d = nueva_pos(lider, f'Director(a) – {trozo[0][0].split(" – ")[0]}', "director",
-                              COSTO_JEFE["director"], b["nombre"], "Dirección", "gerencial")
+                              costo_jefe("director"), b["nombre"], "Dirección", "gerencial")
                 padres.extend([d] * len(trozo))
         for (nombre_eq, gente), padre in zip(lista, padres):
             tipo = Counter(p["tipo_trabajo"] for p in gente).most_common(1)[0][0]
@@ -367,7 +356,7 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
                 # bloque de un solo equipo: el líder del bloque dirige el equipo directamente
                 actuales = [padre]
             else:
-                actuales = [nueva_pos(padre, f"Jefe(a) de {nombre_eq}", "jefe_equipo", COSTO_JEFE["jefe_equipo"],
+                actuales = [nueva_pos(padre, f"Jefe(a) de {nombre_eq}", "jefe_equipo", costo_jefe("jefe_equipo"),
                                       b["nombre"], nombre_eq, tipo)]
             for idx in range(len(capas_jefes) - 2, -1, -1):
                 n = capas_jefes[idx]
@@ -377,7 +366,7 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
                 nuevos = []
                 for i in range(n):
                     nuevos.append(nueva_pos(actuales[i * len(actuales) // n], f"{cargo} – {nombre_eq}", nivel,
-                                            COSTO_JEFE[(nivel, tipo)], b["nombre"], nombre_eq, tipo))
+                                            costo_jefe((nivel, tipo)), b["nombre"], nombre_eq, tipo))
                 actuales = nuevos
             for i, p in enumerate(gente):
                 org.append({"id": p["id"], "jefe_id": actuales[i * len(actuales) // len(gente)], "cargo": p["cargo"],
@@ -385,7 +374,7 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
                             "equipo": nombre_eq, "tipo_trabajo": p["tipo_trabajo"], "persona_id": p["id"],
                             "area_actual": p["area"]})
         resumen_bloques.append({"nombre": b["nombre"], "tipo": b["tipo"], "descripcion": b["descripcion"],
-                                "capacidades_bloque": b["capacidades"] or sorted(CAPACIDADES_PRODUCTO),
+                                "capacidades_bloque": b["capacidades"] or sorted(e.cap_producto),
                                 "categorias": b["categorias"]})
 
     por_id, hijos, capa = _indices(org)
@@ -411,11 +400,11 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
             if rb["nombre"] in profundos and rb["equipos"] > R["tramo_lider_bloque"]:
                 alertas.append(f'{rb["nombre"]} tiene {rb["equipos"]} equipos: su líder necesita una capa de dirección '
                                f'y eso agrega una capa. La forma de quitarla es dividir el bloque en dos '
-                               f'(por ejemplo, plantas por un lado y distribución por otro).')
+                               f'(por ejemplo, {e.pares_incompatibles[0][2].replace(" y ", " por un lado y ")} por otro).')
     ics = sum(1 for p in org if p["rol"] == "ic")
     m["reportes_del_ceo"] = len(hijos[org[0]["id"]])
     m["dotacion"] = {
-        "personas_hoy": len(cargar_asis()),
+        "personas_hoy": len(cargar_asis(e)),
         "contribuidores_individuales_conservados": ics,
         "posiciones_de_jefatura_propuestas": m["jefaturas"],
         "nota": "Todos los contribuidores individuales de hoy están en el diseño. La diferencia entre las personas "
@@ -424,7 +413,7 @@ def disenar_org(modelo: dict, reglas: dict | None = None) -> dict:
     return {"ok": True, "reglas": R, "metricas": m, "bloques": resumen_bloques, "alertas": alertas, "_org": org}
 
 
-def revisar_riesgos(diseno: dict) -> dict:
+def revisar_riesgos(e: Empresa, diseno: dict) -> dict:
     """Chequeos que haría un CHRO sobre el diseño objetivo."""
     org = diseno["_org"]
     R = diseno["reglas"]
@@ -440,10 +429,11 @@ def revisar_riesgos(diseno: dict) -> dict:
                               "hallazgo": f'El equipo de producto {b["nombre"]} tiene solo {b["personas"]} personas; '
                                           f'es poco para tener P&L propio.'})
         caps = set(b.get("capacidades_bloque", []))
-        if {"manufactura", "logistica"} <= caps:
-            hallazgos.append({"severidad": "media", "bloque": b["nombre"],
-                              "hallazgo": f'{b["nombre"]} junta plantas y distribución bajo un solo líder '
-                                          f'({b["personas"]} personas); son operaciones con indicadores distintos.'})
+        for a, z, desc in e.pares_incompatibles:
+            if {a, z} <= caps:
+                hallazgos.append({"severidad": "media", "bloque": b["nombre"],
+                                  "hallazgo": f'{b["nombre"]} junta {desc} bajo un solo líder '
+                                              f'({b["personas"]:,} personas); son operaciones con indicadores distintos.'})
         if b["tipo"] == "plataforma" and b["personas"] < 20:
             hallazgos.append({"severidad": "media", "bloque": b["nombre"],
                               "hallazgo": f'La plataforma {b["nombre"]} tiene {b["personas"]} personas: muy chica '
@@ -454,9 +444,8 @@ def revisar_riesgos(diseno: dict) -> dict:
                                       f'en un modelo producto-plataforma es 12.'})
     for t, s in R["tramo_primera_linea"].items():
         if t == "operativo" and s > 15:
-            hallazgos.append({"severidad": "alta", "bloque": "Plantas",
-                              "hallazgo": f"Un supervisor de planta con {s} operarios por turno compromete la "
-                                          f"seguridad industrial; en plantas de alimentos el estándar ronda 12-15."})
+            hallazgos.append({"severidad": "alta", "bloque": e.bloque_operativo,
+                              "hallazgo": e.riesgo_operativo.format(s=s)})
         if t in ("profesional", "especialista") and s > 9:
             hallazgos.append({"severidad": "media", "bloque": "Equipos profesionales",
                               "hallazgo": f"Un tramo de {s} para trabajo {t} deja poco espacio para formar talento."})
@@ -470,13 +459,13 @@ def revisar_riesgos(diseno: dict) -> dict:
             "reportes_del_ceo": len(diseno["bloques"]), "dotacion": diseno["metricas"].get("dotacion")}
 
 
-def impacto(diseno: dict) -> dict:
-    asis = metricas(cargar_asis())
+def impacto(e: Empresa, diseno: dict) -> dict:
+    asis = metricas(cargar_asis(e))
     tobe = diseno["metricas"]
     tipo_de = {b["nombre"]: b["tipo"] for b in diseno["bloques"]}
     movidos = Counter()
     for p in diseno["_org"]:
-        if p["rol"] == "ic" and str(p.get("area_actual", "")).startswith("BU ") and tipo_de.get(p["bloque"]) != "producto":
+        if p["rol"] == "ic" and e.es_unidad(p.get("area_actual", "")) and tipo_de.get(p["bloque"]) != "producto":
             movidos[(p["area_actual"], p["bloque"])] += 1
     consolidaciones = [{"desde": a, "hacia": b, "personas": n} for (a, b), n in movidos.most_common()][:8]
     ahorro = asis["costo_total_musd"] - tobe["costo_total_musd"]
@@ -495,8 +484,8 @@ def impacto(diseno: dict) -> dict:
     }
 
 
-def resumen_asis_por_area() -> list[dict]:
-    org = cargar_asis()
+def resumen_asis_por_area(e: Empresa) -> list[dict]:
+    org = cargar_asis(e)
     _, hijos, _ = _indices(org)
     c = Counter(p["area"] for p in org)
     j = Counter(p["area"] for p in org if p["id"] in hijos)
@@ -504,44 +493,37 @@ def resumen_asis_por_area() -> list[dict]:
 
 
 # --------------------------------------------------------------------------- vista "organización actual"
-GRUPOS_AREA = {
-    "Supply Chain": "Supply Chain",
-    "Ventas Canal Tradicional": "Fuerza de ventas",
-    "BU Alimentos": "Unidades de negocio", "BU Bebidas": "Unidades de negocio",
-    "BU Cuidado del Hogar": "Unidades de negocio",
-}
-ORDEN_GRUPOS = ["Supply Chain", "Fuerza de ventas", "Unidades de negocio", "Funciones corporativas"]
-
-
-def organizacion_actual() -> dict:
+def organizacion_actual(e: Empresa) -> dict:
     """Todo lo que muestra la vista previa a la corrida: KPIs, pirámide por grupo, focos y duplicaciones."""
-    org = cargar_asis()
+    org = cargar_asis(e)
     por_id, hijos, capa = _indices(org)
-    d = diagnostico()
-    grupo = lambda p: GRUPOS_AREA.get(p["area"], "Funciones corporativas")
+    d = diagnostico(e)
+    grupos = e.orden_grupos
     piramide = defaultdict(Counter)
     for p in org:
-        piramide[capa[p["id"]]][grupo(p)] += 1
+        piramide[capa[p["id"]]][e.grupo(p["area"])] += 1
     costo_area = defaultdict(float)
     for p in org:
         costo_area[p["area"]] += p["costo_anual_usd"]
     for f in d["focos_por_area"]:
-        f["grupo"] = GRUPOS_AREA.get(f["area"], "Funciones corporativas")
+        f["grupo"] = e.grupo(f["area"])
         f["costo_musd"] = round(costo_area[f["area"]] / 1e6, 1)
         f["pct_jefaturas"] = round(100 * f["jefaturas"] / f["personas"], 1)
     areas = [f["area"] for f in sorted(d["focos_por_area"], key=lambda f: -f["personas"])]
-    caps = mapa_capacidades()
+    caps = mapa_capacidades(e)
     conteo = Counter((p["capacidad"], p["area"]) for p in org if p["capacidad"] != "direccion")
     matriz = [{"capacidad": c["nombre"], "clave": c["capacidad"], "duplicada": c["duplicada"],
                "celdas": [conteo.get((c["capacidad"], a), 0) for a in areas]}
               for c in caps["capacidades"]]
     tipos = Counter(p["tipo_trabajo"] for p in org if p["id"] not in hijos and p["capacidad"] != "direccion")
     return {
-        "empresa": "Consumo Andino S.A.A.",
+        "empresa": {"id": e.id, "nombre": e.nombre, "corto": e.corto, "iniciales": e.iniciales, "pais": e.pais,
+                    "sector": e.sector, "tipos": e.tipos, "abrev": e.abrev,
+                    "etiqueta_categoria": e.etiqueta_categoria},
         "metricas": {k: v for k, v in d.items() if k not in ("focos_por_area", "ejemplos_cadenas_un_reporte")},
         "meta_capas": REGLAS_POR_DEFECTO["capas_max"],
-        "grupos": ORDEN_GRUPOS,
-        "piramide_por_grupo": [{"capa": c, **{g: piramide[c].get(g, 0) for g in ORDEN_GRUPOS}} for c in sorted(piramide)],
+        "grupos": grupos,
+        "piramide_por_grupo": [{"capa": c, **{g: piramide[c].get(g, 0) for g in grupos}} for c in sorted(piramide)],
         "focos_por_area": sorted(d["focos_por_area"], key=lambda f: -f["personas"]),
         "ejemplos_cadenas_un_reporte": d["ejemplos_cadenas_un_reporte"],
         "areas_matriz": areas,

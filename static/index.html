@@ -36,7 +36,7 @@
   --motion-fast:120ms; --motion-base:180ms; --motion-slow:280ms; --ease:cubic-bezier(.2,0,0,1);
 
   /* Roles de esta app (todos derivados de tokens) */
-  --grp-supply:var(--rgmx-series-1); --grp-ventas:var(--rgmx-series-2); --grp-bu:var(--rgmx-series-3); --grp-corp:var(--rgmx-series-4);
+  --grp-1:var(--rgmx-series-1); --grp-2:var(--rgmx-series-2); --grp-3:var(--rgmx-series-3); --grp-4:var(--rgmx-series-4);
   --ag-diagnostico:var(--rgmx-series-1); --ag-capacidades:var(--rgmx-series-2); --ag-disenador:var(--rgmx-series-4);
   --ag-optimizador:var(--rgmx-series-3); --ag-impacto:var(--rgmx-series-6); --ag-chro:var(--rgmx-series-5);
   --blk-producto:var(--rgmx-series-2); --blk-plataforma:var(--prizm-primary-40); --blk-habilitador:var(--rgmx-series-6);
@@ -166,6 +166,9 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
 .kpi .arrow{color:var(--prizm-neutral-60)}
 .kpi.pend .num{color:var(--prizm-neutral-80)}
 .kpi .caption{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.kpis.compact .kpi{padding:10px 16px;gap:2px}
+.kpis.compact .num{font-size:28px;line-height:34px}
+.kpis.compact .caption{-webkit-line-clamp:1}
 
 /* ===================================================================== Grillas */
 .g{display:grid;gap:16px;margin-bottom:16px}
@@ -174,9 +177,27 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
 .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .chart{position:relative;width:100%}
 .chart svg{display:block;width:100%;height:100%}
-.chart text{font-family:var(--rgmx-font-sans);font-size:12px;fill:var(--prizm-neutral-variant-40)}
+.chart svg{font-size:12px}
+.chart text{font-family:var(--rgmx-font-sans);fill:var(--prizm-neutral-variant-40)}
 .chart text.v{fill:var(--prizm-neutral-variant-10);font-weight:600}
 .trans{transition:width .9s var(--ease),x .9s var(--ease),y .9s var(--ease),height .9s var(--ease),opacity .4s}
+
+/* Selector de empresa */
+.emp-h{display:flex;align-items:baseline;gap:12px;margin-bottom:8px}
+.emp-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}
+.emp{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);background:#fff;text-align:left;font:inherit;color:inherit;position:relative;min-width:0;cursor:default;transition:border-color var(--motion-fast),box-shadow var(--motion-fast),background var(--motion-fast)}
+.admin .emp{cursor:pointer}
+.admin .emp:hover{border-color:var(--prizm-primary-80);box-shadow:var(--elevation-1)}
+.emp .tile{display:grid;place-items:center;width:42px;height:42px;border-radius:var(--radius-lg);background:var(--prizm-surface-2);color:var(--prizm-neutral-variant-30);flex:none}
+.emp .tx{min-width:0;flex:1}
+.emp .nm{font-weight:600;font-size:15px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.emp .caption{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.emp .meta{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap}
+.emp.on{border-color:var(--prizm-primary-40);box-shadow:0 0 0 1px var(--prizm-primary-40);background:var(--prizm-primary-99)}
+.emp.on .tile{background:var(--prizm-primary-40);color:#fff}
+.emp .chk{position:absolute;top:8px;right:8px;color:var(--prizm-primary-40);display:none}
+.emp.on .chk{display:block}
+.emp.cargando{opacity:.6}
 
 /* Matriz de capacidades */
 .matrix{display:grid;gap:3px;font-size:12px;overflow-x:auto}
@@ -186,7 +207,7 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
 .matrix .c.z{background:var(--prizm-surface-1);color:transparent}
 
 /* ===================================================================== Vista Rediseño */
-.stepbar{display:flex;align-items:center;gap:6px;padding:12px 16px;background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);margin-bottom:16px;overflow-x:auto}
+.stepbar{display:flex;align-items:center;gap:6px;padding:8px 12px;background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);margin-bottom:16px;overflow-x:auto;scrollbar-width:none}
 .st{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:var(--radius-lg);white-space:nowrap;font-size:13px;color:var(--prizm-neutral-variant-40)}
 .st .n{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--prizm-neutral-95);font-size:11px;font-weight:600}
 .st.on{background:var(--prizm-primary-95);color:var(--prizm-primary-40);font-weight:600}
@@ -195,21 +216,97 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
 .st.done .n{background:var(--rgmx-success-strong);color:#fff}
 .st-sep{color:var(--prizm-neutral-80);flex:none}
 .stepbar .ronda{margin-left:auto;display:flex;gap:8px;align-items:center;padding-left:12px}
-.run-grid{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr);gap:16px;align-items:start}
-.agents{display:flex;flex-direction:column;gap:10px;position:sticky;top:0;max-height:calc(100vh - 56px - 52px - 40px - 24px);overflow:auto;scrollbar-width:thin;padding-right:2px}
-.agent{background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);padding:12px 14px;display:flex;flex-direction:column;gap:8px;transition:box-shadow var(--motion-base),border-color var(--motion-base);border-left:4px solid var(--agc)}
+.empchip{display:inline-flex;align-items:center;gap:8px;padding:0 12px 0 4px;height:32px;border-radius:var(--radius-full);background:var(--prizm-primary-95);color:var(--prizm-primary-10);font-weight:600;font-size:13px;white-space:nowrap;flex:none;margin-right:6px}
+.empchip .tile{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--prizm-primary-40);color:#fff;font-size:10px}
+.run-grid{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+.col3{display:flex;flex-direction:column;gap:12px}
+.run-grid .card-h{padding:12px 16px 0}
+.run-grid .card-b{padding:8px 16px 12px}
+#runPiramide{height:330px}#runTramos{height:240px}
+.agents{display:flex;flex-direction:column;gap:8px;scrollbar-width:thin}
+.agent{background:#fff;border:1px solid var(--prizm-neutral-90);border-radius:var(--radius-xl);padding:9px 10px 9px 12px;display:flex;flex-direction:column;gap:6px;transition:box-shadow var(--motion-base),border-color var(--motion-base);border-left:4px solid var(--agc);cursor:pointer;min-height:0}
 .agent.act{box-shadow:var(--elevation-2);border-color:var(--agc)}
 .agent .top{display:flex;align-items:center;gap:10px}
 .agent .who{min-width:0;flex:1}
 .agent .who .title-sm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.agent .txt{font-size:13px;line-height:18px;color:var(--prizm-neutral-variant-30);white-space:pre-wrap;max-height:92px;overflow:auto;scrollbar-width:thin;-webkit-mask-image:linear-gradient(transparent,#000 12px);mask-image:linear-gradient(transparent,#000 12px);padding-top:2px}
-.agent .txt:empty{display:none}
-.agent .bot{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.agent .who .caption{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.agent .who .caption.tl{font-family:var(--rgmx-font-mono);font-size:11px}
+.agent .who .caption.tl svg{color:var(--rgmx-warning-strong);vertical-align:-2px;margin-right:4px}
+.agent .txt{display:none;font-size:13.5px;line-height:19px;color:var(--prizm-neutral-variant-30);white-space:pre-wrap;max-height:180px;overflow:auto;scrollbar-width:thin;-webkit-mask-image:linear-gradient(transparent,#000 10px);mask-image:linear-gradient(transparent,#000 10px);padding-top:2px}
+.agent.open .txt{display:block}
+.agent .txt:empty{display:none!important}
+.agent .bot{display:none;align-items:center;gap:8px;justify-content:space-between}
+.agent.open .bot{display:flex}
 .agent .tool{display:flex;align-items:center;gap:6px;font:400 11px/16px var(--rgmx-font-mono);color:var(--prizm-neutral-variant-40);min-width:0}
 .agent .tool span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .agent .tool svg{color:var(--rgmx-warning-strong)}
-.agent .cfg{flex:none}
-.blocks{display:flex;flex-direction:column;gap:12px}
+.agent .cfg{flex:none;height:28px}
+.agent .icon-btn{width:28px;height:28px}
+.agent.open .icon-btn{display:none}
+.blocks{display:flex;flex-direction:column;gap:10px}
+.run-grid .bk{padding:6px 9px}
+.run-grid .bk b{font-size:12.5px;line-height:16px}
+.run-grid .bk .m{font-size:11.5px}
+.run-grid .bk-grid{grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px}
+.run-grid .bk b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.run-grid .bk .bar{margin-top:4px;height:3px}
+.run-grid .card-h{flex-wrap:nowrap}
+.run-grid .card-h>div:first-child{min-width:0}
+.run-grid .card-h .title-md{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.run-grid .c-mod .legend{display:none}
+.run-grid .band .tit{margin-bottom:4px}
+.chips-bk{display:flex;flex-wrap:wrap;gap:6px}
+.bk-chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:var(--radius-full);border:1px solid var(--prizm-neutral-90);border-left:3px solid var(--c);background:#fff;font-size:12px;white-space:nowrap;animation:entra .45s var(--ease) both}
+.bk-chip b{font-weight:600}
+.bk-chip span{color:var(--prizm-neutral-variant-40);font-variant-numeric:tabular-nums}
+.run-grid .list-sig .signal{padding:8px 10px}
+.run-grid .verdict{padding:10px 12px;margin-bottom:8px}
+/* Una sola pantalla en escritorio: nada de scroll de página */
+@media (min-width:1100px){
+  #v-run.on{display:flex;flex-direction:column;gap:12px;height:100%;min-height:540px;padding:14px 20px;max-width:none}
+  #v-run .stepbar,#v-run .kpis{margin:0;flex:none}
+  #v-run .run-grid{flex:1;min-height:0;grid-template-columns:minmax(280px,330px) minmax(0,1fr) minmax(0,1.3fr);grid-template-rows:minmax(0,1.15fr) minmax(0,1fr)}
+  .run-grid .agents{grid-row:1/3;grid-column:1;min-height:0;overflow:auto;padding:1px 2px 1px 1px}
+  .run-grid .c-pir{grid-column:2;grid-row:1}.run-grid .c-tra{grid-column:2;grid-row:2}
+  .run-grid .col3{grid-column:3;grid-row:1/3;display:flex;flex-direction:column;gap:12px;min-height:0}
+  .run-grid .col3 .c-mod{flex:0 1 auto}
+  .run-grid .col3 .c-chro{flex:1 1 0;min-height:150px}
+  .run-grid .card{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .run-grid .card-b{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
+  .run-grid .card-b.fill{display:flex;flex-direction:column;overflow:hidden}
+  #runPiramide,#runTramos{height:auto;flex:1;min-height:0}
+  .agent{flex:none}
+  .agent.open{flex:1 1 0;min-height:150px}
+  .agent.open .txt{flex:1;min-height:0;max-height:none}
+}
+/* Pantallas bajas (proyector 720p): todo más compacto */
+@media (min-width:1100px) and (max-height:860px){
+  #v-run.on{gap:10px;padding:10px 16px}
+  #v-run .stepbar{padding:6px 10px}
+  .kpis.compact .kpi{padding:8px 14px}
+  .kpis.compact .num{font-size:24px;line-height:30px}
+  .run-grid .card-h .overline{display:none}
+}
+@media (min-width:1100px) and (max-height:860px){
+  .run-grid #chro .signal .body-sm{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  #v-run .run-grid,.run-grid .col3{gap:10px}
+  .run-grid .col3 .card-h{padding-top:10px}
+  .run-grid .blocks{gap:6px}
+  .run-grid .bk .bar{display:none}
+  .run-grid .verdict.sm{padding:6px 12px}
+}
+@media (min-width:1100px) and (max-height:760px){
+  #v-run .run-grid{grid-template-rows:minmax(0,1.35fr) minmax(0,1fr)}
+  .kpis.compact .caption{display:none}
+  .run-grid .card-h .title-md{font-size:14px;line-height:20px}
+  .agent{padding:6px 10px}
+  .agent .avatar.av-32{width:28px;height:28px;font-size:11px}
+}
+@media (max-width:1400px){
+  .acciones .btn.sm{padding:0 10px}
+  .toolbar .tabs{gap:20px}
+  .toolbar .tab{font-size:14px}
+}
 .band .tit{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .band .tit i{width:10px;height:10px;border-radius:3px}
 .bk-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
@@ -224,9 +321,14 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
 .verdict.no{background:var(--rgmx-danger-bg);color:var(--rgmx-danger-fg)}
 .verdict b{font-size:16px;letter-spacing:.6px}
 .list-sig{display:flex;flex-direction:column;gap:8px}
-.attempts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--prizm-neutral-90)}
-.att{display:flex;flex-direction:column;padding:6px 10px;border-radius:var(--radius-lg);background:var(--prizm-surface-1);font-size:12px;font-variant-numeric:tabular-nums}
-.att b{font-size:13px}
+.attempts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;flex:none;padding-top:8px;margin-top:4px;border-top:1px solid var(--prizm-neutral-90)}
+.attempts:empty{display:none}
+.att{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:var(--radius-full);background:var(--prizm-surface-1);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.att b{font-size:12px}
+.verdict.sm{padding:8px 12px;gap:10px}
+.verdict.sm b{font-size:15px}
+.run-grid #chro .list-sig{gap:6px}
+.run-grid #chro .signal{padding:6px 10px;gap:10px;border-radius:8px}
 .att.bad b{color:var(--rgmx-danger-text)}.att.good b{color:var(--rgmx-success-fg)}
 .empty{display:grid;place-items:center;text-align:center;gap:8px;color:var(--prizm-neutral-variant-40);padding:28px 16px}
 .empty svg{color:var(--prizm-neutral-80);width:32px;height:32px}
@@ -284,10 +386,10 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
 /* ===================================================================== Pantallas medianas y celular */
 @media (max-width:1400px){
   .kpi .num{font-size:26px;line-height:32px}
-  .run-grid{grid-template-columns:minmax(280px,320px) minmax(0,1fr)}
   .ag-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:1100px){
+  .emp-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
   .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
   .kpis.k5{grid-template-columns:repeat(3,minmax(0,1fr))}
   .kpi:nth-child(4){border-left:0}
@@ -313,9 +415,10 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
   .kpi{border-left:0!important;border-top:1px solid var(--prizm-neutral-90)}
   .kpi:nth-child(-n+2){border-top:0}
   .kpi:nth-child(even){border-left:1px solid var(--prizm-neutral-90)!important}
-  .run-grid{grid-template-columns:minmax(0,1fr)}
-  .agents{position:static;max-height:none;overflow:visible}
-  .agent:not(.act) .txt{display:none}
+  .emp-strip{gap:8px}
+  .emp{padding:10px}
+  .emp .tile{width:34px;height:34px}
+  .emp .meta,.emp .caption.d{display:none}
   .ag-cards,.vs,.io{grid-template-columns:minmax(0,1fr)}
   .statusbar .hide-sm{display:none}
   .dt .hide-sm{display:none}
@@ -347,12 +450,16 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
     <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
     <symbol id="i-loop" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></symbol>
     <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></symbol>
+    <symbol id="i-cpg" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></symbol>
+    <symbol id="i-banco" viewBox="0 0 24 24"><path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M4 18h16"/><path d="M12 2 21 7H3z"/></symbol>
+    <symbol id="i-retail" viewBox="0 0 24 24"><path d="m2 7 4.4-4.4A2 2 0 0 1 7.8 2h8.4a2 2 0 0 1 1.4.6L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20v3a2 2 0 0 1-2 2 2.7 2.7 0 0 1-2-1 2.7 2.7 0 0 1-4 0 2.7 2.7 0 0 1-4 0 2.7 2.7 0 0 1-4 0 2.7 2.7 0 0 1-2 1 2 2 0 0 1-2-2z"/></symbol>
+    <symbol id="i-telecom" viewBox="0 0 24 24"><path d="M4.9 16.1C1 12.2 1 5.8 4.9 1.9M7.8 4.7a6.1 6.1 0 0 0-.8 7.5"/><circle cx="12" cy="9" r="2"/><path d="M16.2 4.8c2 2 2.3 5.1.8 7.5M19.1 1.9a10 10 0 0 1 0 14.1M9.5 18h5M8 22l4-11 4 11"/></symbol>
   </defs>
 </svg>
 
 <div class="app" id="app">
   <aside class="rail" aria-label="Navegación">
-    <div class="tenant" title="Consumo Andino S.A.A. (empresa ficticia)">CA</div>
+    <div class="tenant" id="tenant" title="Empresa ficticia">CA</div>
     <button class="it on" data-view="org" title="Organización actual" aria-label="Organización actual"><svg class="ico"><use href="#i-users"/></svg></button>
     <button class="it" data-view="run" title="Rediseño con agentes" aria-label="Rediseño con agentes"><svg class="ico"><use href="#i-brainc"/></svg><span class="dotlive"></span></button>
     <button class="it" data-view="how" title="Cómo funciona" aria-label="Cómo funciona"><svg class="ico"><use href="#i-code"/></svg></button>
@@ -364,7 +471,7 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
     <header class="topbar">
       <nav class="crumb" aria-label="Ruta">
         <a class="lvl1" data-view="org">Org Redesign Studio</a><span class="sep sep1">›</span>
-        <a data-view="org">Consumo Andino</a><span class="sep">›</span>
+        <a data-view="org" id="crumbEmp">Consumo Andino</a><span class="sep">›</span>
         <b id="crumbPage">Organización actual</b>
       </nav>
       <div class="sp"></div>
@@ -389,18 +496,20 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
     <div class="content" id="content">
       <!-- ============================================================ 1. ORGANIZACIÓN ACTUAL -->
       <section class="view on" id="v-org">
+        <div class="emp-h"><span class="overline blue">Elige la organización</span><span class="caption" id="empHint">Cuatro empresas ficticias con datos sintéticos</span></div>
+        <div class="emp-strip" id="empStrip"></div>
         <div class="page-h">
           <div>
             <div class="overline blue">Diagnóstico · antes de los agentes</div>
-            <h1 class="headline-md" id="orgTitle">Consumo Andino hoy</h1>
-            <p>Cómo está organizada la empresa antes del rediseño: capas, tramos de control, costo de las jefaturas y capacidades duplicadas. Empresa ficticia con datos sintéticos.</p>
+            <h1 class="headline-md" id="orgTitle">Organización actual</h1>
+            <p id="orgDesc">Cómo está organizada la empresa antes del rediseño: capas, tramos de control, costo de las jefaturas y capacidades duplicadas.</p>
           </div>
           <div class="right"><span class="pill-sum" id="orgPill">—</span></div>
         </div>
         <div class="kpis" id="orgKpis"></div>
         <div class="g g-2">
           <div class="card">
-            <div class="card-h"><div><div class="overline">Pirámide por capas</div><div class="title-md">Las capas 8 a 10 superan la meta del CEO</div></div><div class="legend" id="grpLegend"></div></div>
+            <div class="card-h"><div><div class="overline">Pirámide por capas</div><div class="title-md" id="pirTitle">Capas por encima de la meta del CEO</div></div><div class="legend" id="grpLegend"></div></div>
             <div class="card-b"><div class="chart" id="orgPiramide" style="height:360px"></div></div>
           </div>
           <div class="card">
@@ -430,38 +539,27 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
 
       <!-- ============================================================ 2. REDISEÑO -->
       <section class="view" id="v-run">
-        <div class="page-h">
-          <div>
-            <div class="overline blue">Rediseño · equipo de agentes</div>
-            <h1 class="headline-md" id="runTitle">Seis agentes rediseñan la organización</h1>
-            <p id="runSub">La IA propone, el motor de cálculo cuantifica y el CHRO aprueba. Pulsa el botón de configuración de cualquier agente para ver cómo está armado.</p>
-          </div>
-        </div>
         <div class="stepbar" id="stepbar"></div>
-        <div class="kpis k5" id="runKpis"></div>
+        <div class="kpis k5 compact" id="runKpis"></div>
         <div class="run-grid">
-          <div class="agents" id="agentes"></div>
-          <div>
-            <div class="g g-2e">
-              <div class="card">
-                <div class="card-h"><div><div class="overline">Pirámide por capas</div><div class="title-md">Hoy contra la propuesta</div></div><div class="legend"><span><i style="background:var(--hoy)"></i>Hoy</span><span><i style="background:var(--propuesta)"></i>Propuesta</span></div></div>
-                <div class="card-b"><div class="chart" id="runPiramide" style="height:330px"></div></div>
-              </div>
-              <div class="card">
-                <div class="card-h"><div><div class="overline" id="modeloOver">Modelo producto-plataforma</div><div class="title-md" id="modeloTitle">Esperando al diseñador</div></div><div class="legend"><span><i style="background:var(--blk-producto)"></i>Producto</span><span><i style="background:var(--blk-plataforma)"></i>Plataforma</span><span><i style="background:var(--blk-habilitador)"></i>Habilitador</span></div></div>
-                <div class="card-b"><div class="blocks" id="modelo"></div></div>
-              </div>
-            </div>
-            <div class="g g-2e">
-              <div class="card">
-                <div class="card-h"><div><div class="overline">Tramos de control</div><div class="title-md">Jefes por número de reportes</div></div><div class="legend"><span><i style="background:var(--hoy)"></i>Hoy</span><span><i style="background:var(--propuesta)"></i>Propuesta</span></div></div>
-                <div class="card-b"><div class="chart" id="runTramos" style="height:240px"></div></div>
-              </div>
-              <div class="card">
-                <div class="card-h"><div><div class="overline">Revisión del CHRO</div><div class="title-md">El diseño debe pasar su revisión</div></div></div>
-                <div class="card-b" id="chro"></div>
-              </div>
-            </div>
+          <div class="agents" id="agentes" aria-label="Agentes"></div>
+          <div class="card c-pir">
+            <div class="card-h"><div><div class="overline">Pirámide por capas</div><div class="title-md">Hoy contra la propuesta</div></div><div class="legend"><span><i style="background:var(--hoy)"></i>Hoy</span><span><i style="background:var(--propuesta)"></i>Propuesta</span></div></div>
+            <div class="card-b fill"><div class="chart" id="runPiramide"></div><div class="attempts" id="intentos"></div></div>
+          </div>
+          <div class="card c-tra">
+            <div class="card-h"><div><div class="overline">Tramos de control</div><div class="title-md">Jefes por número de reportes</div></div><div class="legend"><span><i style="background:var(--hoy)"></i>Hoy</span><span><i style="background:var(--propuesta)"></i>Propuesta</span></div></div>
+            <div class="card-b fill"><div class="chart" id="runTramos"></div></div>
+          </div>
+          <div class="col3">
+          <div class="card c-mod">
+            <div class="card-h"><div><div class="overline" id="modeloOver">Modelo producto-plataforma</div><div class="title-md" id="modeloTitle">Esperando al diseñador</div></div><div class="legend"><span><i style="background:var(--blk-producto)"></i>Producto</span><span><i style="background:var(--blk-plataforma)"></i>Plataforma</span><span><i style="background:var(--blk-habilitador)"></i>Habilitador</span></div></div>
+            <div class="card-b"><div class="blocks" id="modelo"></div></div>
+          </div>
+          <div class="card c-chro">
+            <div class="card-h"><div><div class="overline">Revisión del CHRO</div><div class="title-md">El diseño debe pasar su revisión</div></div></div>
+            <div class="card-b" id="chro"></div>
+          </div>
           </div>
         </div>
       </section>
@@ -478,7 +576,7 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
         </div>
         <div class="card" style="margin-bottom:16px"><div class="card-b" style="padding-top:20px">
           <div class="flow">
-            <div class="fnode data"><div class="ic"><svg class="ico"><use href="#i-db"/></svg></div><div class="title-sm">Datos</div><div class="caption">3,744 posiciones sintéticas con jefe, cargo, área, capacidad y costo.</div></div>
+            <div class="fnode data"><div class="ic"><svg class="ico"><use href="#i-db"/></svg></div><div class="title-sm">Datos</div><div class="caption"><span class="nPers">—</span> posiciones sintéticas con jefe, cargo, área, capacidad y costo.</div></div>
             <div class="farrow"><svg class="ico"><use href="#i-arrow"/></svg></div>
             <div class="fnode ai"><div class="ic"><svg class="ico"><use href="#i-spark"/></svg></div><div class="title-sm">6 agentes de IA · deciden</div><div class="caption">Cada uno tiene instrucciones y herramientas propias. Proponen el modelo, eligen los tramos y revisan riesgos.</div></div>
             <div class="farrow"><svg class="ico"><use href="#i-loop"/></svg></div>
@@ -504,9 +602,9 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
           <div class="card"><div class="card-b" style="padding-top:16px">
             <div class="overline blue">Lo que calcula el código</div>
             <ul>
-              <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>Capas, tramos, jefaturas y costo sobre las 3,744 posiciones.</li>
+              <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>Capas, tramos, jefaturas y costo sobre las <span class="nPers">—</span> posiciones.</li>
               <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>El organigrama propuesto, posición por posición.</li>
-              <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>Las validaciones: cada capacidad y categoría en un solo bloque.</li>
+              <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>Las validaciones: cada capacidad y línea de producto en un solo bloque.</li>
               <li><svg class="ico sm" style="color:var(--prizm-primary-40)"><use href="#i-cpu"/></svg>Los chequeos de riesgo que usa el CHRO.</li>
             </ul>
           </div></div>
@@ -523,7 +621,7 @@ table.dt{width:100%;border-collapse:collapse;background:#fff}
     <footer class="statusbar">
       <span class="lbl">Bitácora</span><span id="ticker">—</span>
       <span class="sp"></span>
-      <span class="hide-sm" id="sbInfo">3,744 posiciones · datos sintéticos</span>
+      <span class="hide-sm" id="sbInfo">Datos sintéticos</span>
       <a class="hide-sm" href="/api/descargar/actual.csv"><svg class="ico xs"><use href="#i-dl"/></svg>Organigrama actual</a>
       <a class="hide-sm" id="dlProp" href="/api/descargar/propuesta.csv" style="display:none"><svg class="ico xs"><use href="#i-dl"/></svg>Propuesta</a>
     </footer>
@@ -582,20 +680,22 @@ const AG_COLOR = id => `var(--ag-${id})`;
 const INICIALES = {diagnostico:'DG', capacidades:'MC', disenador:'DP', optimizador:'SL', impacto:'IM', chro:'HR'};
 const ESTADO_BADGE = {'en espera':['b-draft','En espera'], pensando:['b-info','Pensando'], trabajando:['b-pending','Calculando'], listo:['b-ok','Listo'], error:['b-high','Error']};
 const PASOS = [['diagnostico','Diagnóstico'],['capacidades','Capacidades'],['disenador','Diseño'],['optimizador','Span & layers'],['impacto','Impacto'],['chro','CHRO']];
-const GRP_VAR = {'Supply Chain':'--grp-supply','Fuerza de ventas':'--grp-ventas','Unidades de negocio':'--grp-bu','Funciones corporativas':'--grp-corp'};
-const TIPO_ES = {operativo:'Operativo (plantas y almacenes)', comercial_campo:'Comercial de campo', profesional:'Profesional', especialista:'Especialista'};
+// colores de grupo y etiquetas: vienen de la empresa activa
+const grpVar = g => `--grp-${Math.max(0, (ORG?.grupos || []).indexOf(g)) + 1}`;
+const tipoEs = t => ORG?.empresa?.tipos?.[t] || t;
+const abrev = a => ORG?.empresa?.abrev?.[a] || a.replace(/^BU /, 'BU ');
 
 let E = null, empresa = null, ORG = null, CFG = null, vista = 'org';
 
 // ============================================================================ estado (espejo de app/bus.py)
-function estadoInicial(){
+function estadoInicial(emp){
   const ag = {};
   (empresa?.agentes || []).forEach(a => ag[a.id] = {...a, estado:'en espera', texto:'', herramientas:[], ronda:1});
-  return {corrida:{estado:'lista', modo:null, inicio:null, fin:null, fase:'Esperando al partner'}, agentes:ag, datos:{}, bitacora:[]};
+  return {empresa: emp || E?.empresa || 'cpg', corrida:{estado:'lista', modo:null, inicio:null, fin:null, fase:'Esperando al partner'}, agentes:ag, datos:{}, bitacora:[]};
 }
 function aplicar(ev){
   const t = ev.type;
-  if (t === 'reset'){ E = estadoInicial(); }
+  if (t === 'reset' || t === 'empresa'){ E = estadoInicial(ev.empresa); }
   else if (t === 'run_start'){ E = estadoInicial(); Object.assign(E.corrida, {estado:'corriendo', modo:ev.modo, inicio:ev.ts}); irA('run'); }
   else if (t === 'phase'){ E.corrida.fase = ev.name; E.bitacora.push({ts:ev.ts, texto:ev.name}); }
   else if (t === 'agent_status'){ const a = E.agentes[ev.agent]; a.estado = ev.status;
@@ -619,6 +719,8 @@ function irA(v){
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-view]'); if (b){ irA(b.dataset.view); return; }
   const c = e.target.closest('[data-cfg]'); if (c){ abrirAgente(c.dataset.cfg); return; }
+  const em = e.target.closest('[data-emp]'); if (em){ elegirEmpresa(em.dataset.emp); return; }
+  const ag = e.target.closest('.agent[data-ag]'); if (ag && E?.agentes[ag.dataset.ag]?.texto){ ultimoAgente = ag.dataset.ag; render(); return; }
   if (e.target.closest('[data-close]') || e.target.classList.contains('scrim')) $$('.scrim').forEach(s => s.classList.remove('on'));
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') $$('.scrim').forEach(s => s.classList.remove('on')); });
@@ -651,7 +753,10 @@ const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).
 function vistaOrg(){
   if (!ORG) return;
   const m = ORG.metricas, meta = ORG.meta_capas;
-  $('#orgTitle').textContent = `Consumo Andino hoy: ${n0(m.personas)} personas en ${m.capas} capas`;
+  empStrip();
+  $('#orgTitle').textContent = `${ORG.empresa.corto} hoy: ${n0(m.personas)} personas en ${m.capas} capas`;
+  $('#orgDesc').textContent = `${ORG.empresa.sector} · ${ORG.empresa.pais}. Cómo está organizada antes del rediseño: capas, tramos de control, costo de las jefaturas y capacidades duplicadas.`;
+  $('#pirTitle').textContent = m.capas > meta ? `Las capas ${meta + 1} a ${m.capas} superan la meta del CEO` : 'Dentro de la meta del CEO';
   $('#orgPill').textContent = `${ORG.focos_por_area.length} áreas · ${n0(m.jefaturas)} jefaturas · ${ORG.duplicadas.length} capacidades duplicadas`;
   const pctJef = 100 * m.costo_jefaturas_musd / m.costo_total_musd;
   const kp = [
@@ -664,7 +769,7 @@ function vistaOrg(){
   ];
   const h = kp.map(([l, v, d, c]) => `<div class="kpi"><div class="overline">${l}</div><div class="v"><span class="num">${v}</span>${d}</div><div class="caption" title="${esc(c)}">${c}</div></div>`).join('');
   if ($('#orgKpis').dataset.h !== h){ $('#orgKpis').dataset.h = h; $('#orgKpis').innerHTML = h; }
-  const leg = ORG.grupos.map(g => `<span><i style="background:var(${GRP_VAR[g]})"></i>${g}</span>`).join('');
+  const leg = ORG.grupos.map(g => `<span><i style="background:var(${grpVar(g)})"></i>${g}</span>`).join('');
   $('#grpLegend').innerHTML = leg; $('#grpLegend2').innerHTML = leg;
   piramideGrupos(); tramosOrg(); tiposOrg(); senalesOrg(); tablaAreas(); matriz();
 }
@@ -683,7 +788,7 @@ function piramideGrupos(){
     let x = izq; const t = tot(r);
     ORG.grupos.forEach(g => {
       const ww = (w - izq - der) * r[g] / max; if (!r[g]) return;
-      const rect = nodo(svg, 'rect', {x, y, width: Math.max(ww - 1.5, 1), height: alto, rx: 3, fill: css(GRP_VAR[g])});
+      const rect = nodo(svg, 'rect', {x, y, width: Math.max(ww - 1.5, 1), height: alto, rx: 3, fill: css(grpVar(g))});
       rect.dataset.tip = `<b>Capa ${r.capa} · ${g}</b>${n0(r[g])} personas`;
       x += ww;
     });
@@ -714,10 +819,11 @@ function tramosOrg(){
 function tiposOrg(){
   const tot = ORG.contribuidores_por_tipo.reduce((s, r) => s + r.personas, 0);
   const cols = ['--rgmx-series-1','--rgmx-series-2','--rgmx-series-3','--rgmx-series-4'];
-  const h = `<div style="display:flex;height:12px;border-radius:9999px;overflow:hidden;gap:2px">${ORG.contribuidores_por_tipo.map((r, i) =>
-      `<i style="flex:${r.personas};background:var(${cols[i]})" data-tip="<b>${TIPO_ES[r.tipo]}</b>${n0(r.personas)} personas"></i>`).join('')}</div>
-    <div class="legend" style="margin-top:8px">${ORG.contribuidores_por_tipo.map((r, i) =>
-      `<span><i style="background:var(${cols[i]})"></i>${TIPO_ES[r.tipo]} · <b class="tabular">${n1(100 * r.personas / tot)}%</b></span>`).join('')}</div>`;
+  const filas = ORG.contribuidores_por_tipo.map((r, i) => ({...r, col: cols[i]})).filter(r => r.personas > 0);
+  const h = `<div style="display:flex;height:12px;border-radius:9999px;overflow:hidden;gap:2px">${filas.map(r =>
+      `<i style="flex:${r.personas};background:var(${r.col})" data-tip="<b>${esc(tipoEs(r.tipo))}</b>${n0(r.personas)} personas"></i>`).join('')}</div>
+    <div class="legend" style="margin-top:8px">${filas.map(r =>
+      `<span><i style="background:var(${r.col})"></i>${esc(tipoEs(r.tipo))} · <b class="tabular">${n1(100 * r.personas / tot)}%</b></span>`).join('')}</div>`;
   if ($('#orgTipos').dataset.h !== h){ $('#orgTipos').dataset.h = h; $('#orgTipos').innerHTML = h; }
 }
 
@@ -741,8 +847,8 @@ function tablaAreas(){
   const f = ORG.focos_por_area, max = Math.max(...f.map(r => r.personas)), meta = ORG.meta_capas;
   const sem = t => t < 4 ? 'var(--rgmx-tl-red)' : t < 7 ? 'var(--rgmx-tl-yellow)' : 'var(--rgmx-tl-green)';
   const h = `<thead><tr><th>Área</th><th>Personas</th><th>Jefaturas</th><th class="hide-sm">% jefaturas</th><th>Tramo promedio</th><th class="hide-sm">Jefes con 1 reporte</th><th>Capa más profunda</th><th class="hide-sm">Costo anual</th></tr></thead><tbody>${f.map(r => `
-    <tr><td><span class="dot" style="background:var(${GRP_VAR[r.grupo]})"></span><b style="font-weight:500">${esc(r.area)}</b></td>
-    <td><span class="minibar"><i style="width:${100 * r.personas / max}%;background:var(${GRP_VAR[r.grupo]})"></i></span>${n0(r.personas)}</td>
+    <tr><td><span class="dot" style="background:var(${grpVar(r.grupo)})"></span><b style="font-weight:500">${esc(r.area)}</b></td>
+    <td><span class="minibar"><i style="width:${100 * r.personas / max}%;background:var(${grpVar(r.grupo)})"></i></span>${n0(r.personas)}</td>
     <td>${n0(r.jefaturas)}</td><td class="hide-sm">${n1(r.pct_jefaturas)}%</td>
     <td><span class="dot" style="background:${sem(r.tramo_promedio)}"></span>${n1(r.tramo_promedio)}</td>
     <td class="hide-sm">${r.jefes_un_reporte}</td>
@@ -751,7 +857,6 @@ function tablaAreas(){
   const t = $('#orgTabla'); if (t.dataset.h !== h){ t.dataset.h = h; t.innerHTML = h; }
 }
 
-const ABREV = {'Supply Chain':'Supply','Ventas Canal Tradicional':'Ventas CT','BU Alimentos':'BU Alim.','BU Cuidado del Hogar':'BU Hogar','BU Bebidas':'BU Bebidas','Gestión Humana':'G. Humana','Finanzas':'Finanzas','Tecnología':'Tecnología','Legal y Asuntos Corporativos':'Legal'};
 function matriz(){
   const areas = ORG.areas_matriz, filas = ORG.matriz_capacidades;
   const max = Math.max(...filas.flatMap(r => r.celdas));
@@ -760,7 +865,7 @@ function matriz(){
   const steps = ['--prizm-primary-95','--prizm-primary-90','--prizm-primary-80','--prizm-primary-70','--prizm-primary-60','--prizm-primary-50','--prizm-primary-40','--prizm-primary-30'];
   const color = v => { const i = Math.min(steps.length - 1, Math.floor(Math.log(1 + v) / Math.log(1 + max) * steps.length)); return [`var(${steps[i]})`, i >= 5 ? '#fff' : 'var(--prizm-primary-10)']; };
   let h = `<div class="matrix" style="grid-template-columns:minmax(200px,1.4fr) repeat(${areas.length},minmax(58px,1fr)) 92px"><div></div>`;
-  h += areas.map(a => `<div class="chd" title="${esc(a)}">${esc(ABREV[a] || a)}</div>`).join('') + '<div class="chd">Áreas</div>';
+  h += areas.map(a => `<div class="chd" title="${esc(a)}">${esc(abrev(a))}</div>`).join('') + '<div class="chd">Áreas</div>';
   filas.forEach(r => {
     const nA = r.celdas.filter(Boolean).length;
     h += `<div class="rh">${r.duplicada ? ico('alert','xs').replace('class="ico xs"', 'class="ico xs" style="color:var(--rgmx-warning-strong)"') : '<span style="width:14px"></span>'}<span title="${esc(r.capacidad)}">${esc(r.capacidad)}</span></div>`;
@@ -778,10 +883,11 @@ function vistaRun(){
 }
 function stepbar(){
   const A = E.agentes; const ronda = Math.max(...Object.values(A).map(a => a.ronda || 1));
-  const h = PASOS.map(([id, nom], i) => {
+  const emp = ORG?.empresa;
+  const h = (emp ? `<span class="empchip" title="${esc(emp.nombre)} · empresa ficticia"><span class="tile">${esc(emp.iniciales)}</span>${esc(emp.corto)}</span>` : '') + PASOS.map(([id, nom], i) => {
     const a = A[id] || {}; const st = a.estado === 'listo' ? 'done' : (a.estado === 'pensando' || a.estado === 'trabajando') ? 'on' : '';
     return (i ? `<svg class="ico sm st-sep"><use href="#i-chevr"/></svg>` : '') + `<div class="st ${st}"><span class="n">${st === 'done' ? '✓' : i + 1}</span>${nom}</div>`;
-  }).join('') + `<div class="ronda">${ronda > 1 ? '<span class="badge b-pending">Ronda 2 · corrige objeciones</span>' : '<span class="badge b-period">Ronda 1</span>'}<span class="caption" style="white-space:nowrap">${esc(E.corrida.fase)}</span></div>`;
+  }).join('') + `<div class="ronda">${ronda > 1 ? '<span class="badge b-pending" title="El equipo corrige las objeciones del CHRO">Ronda 2</span>' : '<span class="badge b-period">Ronda 1</span>'}</div>`;
   const s = $('#stepbar'); if (s.dataset.h !== h){ s.dataset.h = h; s.innerHTML = h; }
 }
 function kpisRun(){
@@ -800,28 +906,46 @@ function kpisRun(){
     <div class="caption">${imp ? `Costo de personal ${money(imp.antes.costo_total_musd)} → ${money(imp.despues.costo_total_musd)}` : 'Esperando al agente de impacto'}</div></div>`;
   const c = $('#runKpis'); if (c.dataset.h !== h){ c.dataset.h = h; c.innerHTML = h; }
 }
+// La tarjeta del agente que está trabajando se expande y muestra su texto; las demás quedan en una línea.
+let ultimoAgente = null;
 function agentes(){
   const cont = $('#agentes');
-  Object.values(E.agentes).forEach(a => {
+  const lista = Object.values(E.agentes);
+  const activos = lista.filter(a => a.estado === 'pensando' || a.estado === 'trabajando').map(a => a.id);
+  if (activos.length) ultimoAgente = activos[activos.length - 1];
+  if (ultimoAgente && !E.agentes[ultimoAgente]?.texto && !activos.length) ultimoAgente = null;
+  if (!ultimoAgente && !activos.length){ const hechos = PASOS.map(([id]) => E.agentes[id]).filter(a => a && a.texto.trim()); ultimoAgente = hechos.length ? hechos[hechos.length - 1].id : null; }
+  const abiertos = new Set(activos.length ? activos : (ultimoAgente ? [ultimoAgente] : []));
+  lista.forEach(a => {
     let el = document.getElementById('ag-' + a.id);
     if (!el){
       el = document.createElement('article'); el.className = 'agent'; el.id = 'ag-' + a.id; el.style.setProperty('--agc', AG_COLOR(a.id));
+      el.dataset.ag = a.id; el.title = 'Ver lo que escribe este agente';
       el.innerHTML = `<div class="top"><div class="avatar av-32" style="background:${AG_COLOR(a.id)}">${INICIALES[a.id]}</div>
-        <div class="who"><div class="title-sm">${esc(a.nombre)}</div><div class="caption">${esc(a.rol)}</div></div><span class="badge"></span></div>
+        <div class="who"><div class="title-sm">${esc(a.nombre)}</div><div class="caption"></div></div><span class="badge"></span>
+        <button class="icon-btn" data-cfg="${a.id}" title="Configuración: instrucciones, herramientas y lo que hizo" aria-label="Configuración de ${esc(a.nombre)}">${ico('code')}</button></div>
         <div class="txt"></div>
         <div class="bot"><div class="tool"></div><button class="btn btn-text sm cfg" data-cfg="${a.id}" title="Ver instrucciones, herramientas y lo que hizo en esta corrida">${ico('code')}Configuración</button></div>`;
       cont.appendChild(el);
     }
     const [cls, lab] = ESTADO_BADGE[a.estado] || ['b-draft', a.estado];
-    const b = el.querySelector('.badge'); b.className = 'badge ' + cls;
-    b.innerHTML = (a.estado === 'pensando' || a.estado === 'trabajando' ? '<span class="pulse"></span>' : '') + lab + (a.ronda > 1 ? ' · R2' : '');
-    const act = a.estado === 'pensando' || a.estado === 'trabajando';
-    if (act && !el.classList.contains('act') && vista === 'run' && cont.scrollHeight > cont.clientHeight) cont.scrollTo({top: el.offsetTop - cont.offsetTop - 4, behavior: 'smooth'});
+    const b = el.querySelector('.badge'), bc = 'badge ' + cls;
+    const bh = (a.estado === 'pensando' || a.estado === 'trabajando' ? '<span class="pulse"></span>' : '') + lab + (a.ronda > 1 ? ' · R2' : '');
+    if (b.className !== bc) b.className = bc;
+    if (b.dataset.h !== bh){ b.dataset.h = bh; b.innerHTML = bh; }
+    const act = activos.includes(a.id), abierto = abiertos.has(a.id);
     el.classList.toggle('act', act);
+    if (el.classList.contains('open') !== abierto){
+      el.classList.toggle('open', abierto);
+      if (abierto && vista === 'run' && cont.scrollHeight > cont.clientHeight) cont.scrollTo({top: el.offsetTop - cont.offsetTop - 4, behavior: 'smooth'});
+    }
     const txt = el.querySelector('.txt'), limpio = a.texto.trim();
     if (txt.dataset.raw !== limpio){ txt.dataset.raw = limpio; txt.innerHTML = md(limpio); txt.scrollTop = txt.scrollHeight; }
     const hh = a.herramientas[a.herramientas.length - 1];
-    const th = hh ? `${ico('zap','xs')}<span title="${esc(hh.resumen)}">${esc(hh.resumen)}</span>` : '';
+    const cap = el.querySelector('.who .caption');
+    const ch = hh ? `${ico('zap','xs')}${esc(hh.resumen)}` : esc(a.rol);
+    if (cap.dataset.h !== ch){ cap.dataset.h = ch; cap.innerHTML = ch; cap.classList.toggle('tl', !!hh); cap.title = hh ? hh.resumen : a.rol; }
+    const th = hh ? `${ico('zap','xs')}<span title="${esc(hh.resumen)}">${esc(hh.resumen)}</span>` : `<span>${esc(a.rol)}</span>`;
     const tl = el.querySelector('.tool'); if (tl.dataset.h !== th){ tl.dataset.h = th; tl.innerHTML = th; }
   });
 }
@@ -834,17 +958,19 @@ function piramideRun(){
   const T = tobe ? Object.fromEntries(tobe.metricas.piramide.map(r => [r.capa, r.personas])) : {};
   const capas = Math.max(asis.capas, tobe?.metricas.capas || 0);
   const max = Math.max(...Object.values(A), ...Object.values(T));
-  const c = w / 2, eje = 64, ancho = (w - eje) / 2 - 48, fila = (h - 4) / capas, alto = Math.min(22, fila - 5);
+  const c = w / 2, eje = 64, ancho = (w - eje) / 2 - 48, fila = (h - 4) / capas, alto = Math.max(3, Math.min(22, fila - 4));
+  const fs = Math.max(9, Math.min(12, fila - 2));  // letra más chica si la pantalla es baja
+  svg.style.fontSize = fs + 'px';
   for (let k = 1; k <= 12; k++){
     const vis = k <= capas, y = 2 + (k - 1) * fila + (fila - alto) / 2, a = A[k] || 0, t = T[k] || 0;
     const wa = a ? Math.max(2, ancho * a / max) : 0, wt = t ? Math.max(2, ancho * t / max) : 0;
-    nodo(svg, 'text', {x: c, y: y + alto / 2 + 4, 'text-anchor': 'middle', 'font-weight': 600, opacity: vis ? 1 : 0}, 'l' + k, `Capa ${k}`);
+    nodo(svg, 'text', {x: c, y: y + alto / 2 + fs / 3, 'text-anchor': 'middle', 'font-weight': 600, opacity: vis ? 1 : 0}, 'l' + k, `Capa ${k}`);
     nodo(svg, 'rect', {class: 'trans', x: c - eje / 2 - wa, y, width: wa, height: alto, rx: 3, fill: css('--hoy'), opacity: vis ? 1 : 0}, 'a' + k).dataset.tip = `<b>Hoy · capa ${k}</b>${n0(a)} personas`;
-    nodo(svg, 'text', {x: c - eje / 2 - wa - 6, y: y + alto / 2 + 4, 'text-anchor': 'end', opacity: vis && a ? 1 : 0}, 'va' + k, n0(a));
+    nodo(svg, 'text', {x: c - eje / 2 - wa - 6, y: y + alto / 2 + fs / 3, 'text-anchor': 'end', opacity: vis && a ? 1 : 0}, 'va' + k, n0(a));
     nodo(svg, 'rect', {class: 'trans', x: c + eje / 2, y, width: wt, height: alto, rx: 3, fill: css('--propuesta'), opacity: vis && t ? 1 : 0}, 't' + k).dataset.tip = `<b>Propuesta · capa ${k}</b>${n0(t)} personas`;
-    nodo(svg, 'text', {x: c + eje / 2 + wt + 6, y: y + alto / 2 + 4, class: 'v', opacity: vis && t ? 1 : 0}, 'vt' + k, n0(t));
+    nodo(svg, 'text', {x: c + eje / 2 + wt + 6, y: y + alto / 2 + fs / 3, class: 'v', opacity: vis && t ? 1 : 0}, 'vt' + k, n0(t));
   }
-  nodo(svg, 'text', {x: c + eje / 2 + 8, y: h / 2, opacity: tobe ? 0 : 1}, 'espera', 'Propuesta: esperando al optimizador');
+  nodo(svg, 'text', {x: c + eje / 2 + (w - c - eje / 2) / 2, y: h / 2, 'text-anchor': 'middle', opacity: tobe ? 0 : 1}, 'espera', 'Esperando al optimizador');
 }
 function tramosRun(){
   const asis = E.datos.asis || ORG?.metricas; if (!asis) return;
@@ -874,11 +1000,15 @@ function modelo(){
     $('#modeloTitle').textContent = tobe ? `${tobe.bloques.length} bloques reportan al CEO` : 'Propuesta del diseñador';
     const banda = (tit, color, lista, det) => `<div class="band"><div class="tit"><i style="background:${color}"></i><span class="overline" style="color:${color}">${tit} · ${lista.length}</span></div><div class="bk-grid">${lista.map(b => {
       const x = B[b.nombre];
-      return `<div class="bk" style="--c:${color}" data-tip="<b>${esc(b.nombre)}</b>${x ? `${n0(x.personas)} personas · ${x.jefaturas} jefaturas · ${x.capas} capas · ${money(x.costo_musd)}` : esc(det(b))}"><b>${esc(b.nombre)}</b><div class="m">${x ? `${n0(x.personas)} personas · ${x.capas} capas` : esc(det(b))}</div>${x ? `<div class="bar"><i style="width:${Math.max(3, 100 * Math.sqrt(x.personas / maxP))}%"></i></div>` : ''}</div>`;
+      return `<div class="bk" style="--c:${color}" data-tip="<b>${esc(b.nombre)}</b>${x ? `${n0(x.personas)} personas · ${x.jefaturas} jefaturas · ${x.capas} capas · ${money(x.costo_musd)}` : esc(det(b))}"><b>${esc(b.nombre)}</b><div class="m">${x ? `${n0(x.personas)} personas` : esc(det(b))}</div>${x ? `<div class="bar"><i style="width:${Math.max(3, 100 * Math.sqrt(x.personas / maxP))}%"></i></div>` : ''}</div>`;
+    }).join('')}</div></div>`;
+    const chips = (tit, color, lista) => `<div class="band"><div class="tit"><i style="background:${color}"></i><span class="overline" style="color:${color}">${tit} · ${lista.length}</span></div><div class="chips-bk">${lista.map(b => {
+      const x = B[b.nombre];
+      return `<span class="bk-chip" style="--c:${color}" data-tip="<b>${esc(b.nombre)}</b>${x ? `${n0(x.personas)} personas · ${x.jefaturas} jefaturas · ${money(x.costo_musd)}` : esc((b.capacidades || []).length + ' capacidades')}"><b>${esc(b.nombre)}</b>${x ? `<span>${n0(x.personas)}</span>` : ''}</span>`;
     }).join('')}</div></div>`;
     h = banda('Productos', 'var(--blk-producto)', mod.productos || [], b => (b.categorias || []).join(', '))
       + banda('Plataformas', 'var(--blk-plataforma)', mod.plataformas || [], b => `${(b.capacidades || []).length} capacidades`)
-      + banda('Habilitadores', 'var(--blk-habilitador)', mod.habilitadores || [], b => `${(b.capacidades || []).length} capacidades`);
+      + chips('Habilitadores', 'var(--blk-habilitador)', mod.habilitadores || []);
   }
   if (cont.dataset.h !== h){ cont.dataset.h = h; cont.innerHTML = h; }
 }
@@ -887,7 +1017,7 @@ function chro(){
   let h = '';
   if (v){
     const ok = v.veredicto === 'APROBADO';
-    h += `<div class="verdict ${ok ? 'ok' : 'no'}">${ico(ok ? 'check' : 'alert', '')}<div><b>${ok ? 'APROBADO' : 'OBJETADO'}</b><div class="caption" style="color:inherit">${ok ? 'Con estas condiciones de implementación' : 'El equipo debe corregir antes del directorio'}</div></div></div>`;
+    h += `<div class="verdict sm ${ok ? 'ok' : 'no'}">${ico(ok ? 'check' : 'alert', '')}<b>${ok ? 'APROBADO' : 'OBJETADO'}</b><span class="caption" style="color:inherit">${ok ? 'con estas condiciones de implementación' : 'el equipo debe corregir antes del directorio'}</span></div>`;
     const items = ok ? (v.cambios_pedidos || []) : (v.objeciones || []);
     h += `<div class="list-sig">${items.map(o => `<div class="signal ${ok ? 'ok' : 'bad'}" style="padding:10px 12px"><div class="ic" style="width:24px;height:24px">${ico(ok ? 'check' : 'alert', 'xs')}</div><div class="body-sm">${esc(o)}</div></div>`).join('')}</div>`;
   } else if (r){
@@ -895,11 +1025,10 @@ function chro(){
   } else {
     h += `<div class="empty">${ico('check','')}<div class="body-sm">El CHRO revisa el diseño cuando el equipo termina. Puede objetarlo y obligar a una segunda ronda.</div></div>`;
   }
-  if (hist.length){
-    const meta = ORG?.meta_capas || 7;
-    h += `<div class="attempts"><span class="overline" style="width:100%">Intentos del optimizador</span>${hist.map((x, i) => `<div class="att ${x.capas > meta ? 'bad' : 'good'}"><span class="caption">#${i + 1}</span><b>${x.capas} capas</b><span>${n0(x.jefaturas)} jefaturas</span></div>`).join('')}</div>`;
-  }
   const c = $('#chro'); if (c.dataset.h !== h){ c.dataset.h = h; c.innerHTML = h; }
+  const meta = ORG?.meta_capas || 7;
+  const hi = hist.length ? `<span class="overline">Intentos</span>${hist.map((x, i) => `<span class="att ${x.capas > meta ? 'bad' : 'good'}" data-tip="<b>Intento ${i + 1} del optimizador</b>${x.capas} capas · ${n0(x.jefaturas)} jefaturas · tramo ${n1(x.tramo_promedio)}"><span class="caption">#${i + 1}</span><b>${x.capas} capas</b></span>`).join('')}` : '';
+  const ci = $('#intentos'); if (ci.dataset.h !== hi){ ci.dataset.h = hi; ci.innerHTML = hi; }
 }
 
 // ============================================================================ VISTA 3: cómo funciona
@@ -921,7 +1050,7 @@ function vistaHow(){
   $('#caso').textContent = CFG.caso;
   const R = CFG.reglas_por_defecto, T = R.tramo_primera_linea;
   $('#reglas').innerHTML = `<table class="dt"><thead><tr><th>Regla</th><th>Valor</th></tr></thead><tbody>
-    ${Object.entries(T).map(([k, v]) => `<tr><td>Supervisor de trabajo ${esc(TIPO_ES[k].toLowerCase())}</td><td>${v} reportes</td></tr>`).join('')}
+    ${Object.entries(T).map(([k, v]) => `<tr><td>Supervisor de trabajo ${esc(tipoEs(k).toLowerCase())}</td><td>${v} reportes</td></tr>`).join('')}
     <tr><td>Jefe de jefes</td><td>${R.tramo_gerencial} reportes</td></tr>
     <tr><td>Líder de bloque antes de crear una capa de dirección</td><td>${R.tramo_lider_bloque} reportes</td></tr>
     <tr><td>Máximo de capas (meta del CEO)</td><td>${R.capas_max}</td></tr></tbody></table>
@@ -980,6 +1109,7 @@ function dibujar(){
   $('#ticker').textContent = ult ? (ult.agente ? `${E.agentes[ult.agente]?.nombre} · ` : '') + ult.texto : 'Lista para empezar';
   $('#dlProp').style.display = E.datos.tobe ? '' : 'none';
   $$('.acciones [data-modo]').forEach(b => b.disabled = corriendo || (b.id === 'bVivo' && empresa && !empresa.vivo_disponible));
+  if (ORG && E.empresa && E.empresa !== ORG.empresa.id){ cargarEmpresa(E.empresa); return; }
   if (vista === 'org') vistaOrg();
   if (vista === 'run') vistaRun();
   if (vista === 'how') vistaHow();
@@ -997,7 +1127,10 @@ window.addEventListener('resize', () => { $$('[data-h]').forEach(x => delete x.d
 function conectar(){
   const es = new EventSource('/api/eventos');
   es.addEventListener('snapshot', e => { E = JSON.parse(e.data); if (E.corrida.estado !== 'lista' && vista === 'org' && !irA._manual) irA('run'); render(); });
-  es.onmessage = e => { if (!E) return; aplicar(JSON.parse(e.data)); render(); };
+  es.onmessage = e => { if (!E) return; const ev = JSON.parse(e.data); aplicar(ev);
+    if (ev.type === 'empresa') irA('org');
+    if (ev.type === 'run_end') fetch('/api/empresa?empresa=' + E.empresa).then(r => r.json()).then(d => { empresa = d; botones(); render(); });
+    render(); };
   es.onerror = () => { $('#ticker').textContent = 'Reconectando…'; };
 }
 
@@ -1008,6 +1141,53 @@ async function post(url){
 }
 $$('.acciones [data-modo]').forEach(b => b.onclick = () => { irA('run'); post('/api/correr?modo=' + b.dataset.modo); });
 $('#bReiniciar').onclick = () => post('/api/reiniciar');
+
+// ============================================================================ empresas
+const ICONO_EMP = {cpg:'cpg', banco:'banco', retail:'retail', telecom:'telecom'};
+function empStrip(){
+  if (!empresa?.empresas) return;
+  const act = ORG?.empresa?.id, corriendo = E?.corrida?.estado === 'corriendo';
+  $('#empHint').textContent = TOKEN ? (corriendo ? 'Reinicia la corrida para cambiar de empresa' : 'Haz clic para cambiar; todas las pantallas cambian contigo') : 'La elige el presentador; tu pantalla cambia sola';
+  const h = empresa.empresas.map(x => `<button class="emp ${x.id === act ? 'on' : ''}" data-emp="${x.id}" ${TOKEN && !corriendo ? '' : 'disabled'} aria-pressed="${x.id === act}">
+      <span class="tile">${ico(ICONO_EMP[x.id] || 'users', '')}</span>
+      <span class="tx"><span class="nm" style="display:block">${esc(x.corto)}</span><span class="caption" style="display:block">${esc(x.sector)} · ${esc(x.pais)}</span>
+        <span class="meta"><span class="badge b-period">${n0(x.personas)} personas</span>${TOKEN && x.grabacion_disponible ? '<span class="badge b-ok">Grabación lista</span>' : ''}</span></span>
+      <svg class="ico sm chk"><use href="#i-check"/></svg></button>`).join('');
+  const s = $('#empStrip'); if (s.dataset.h !== h){ s.dataset.h = h; s.innerHTML = h; }
+}
+async function elegirEmpresa(id){
+  if (!TOKEN || id === ORG?.empresa?.id || E?.corrida?.estado === 'corriendo') return;
+  $$('.emp').forEach(b => b.classList.toggle('cargando', b.dataset.emp === id));
+  await post('/api/seleccionar?empresa=' + id);
+}
+let cargando = null;
+function cargarEmpresa(id){
+  if (cargando) return cargando;
+  cargando = (async () => {
+    try {
+      const q = id ? '?empresa=' + encodeURIComponent(id) : '';
+      [empresa, ORG, CFG] = await Promise.all(['/api/empresa', '/api/organizacion', '/api/agentes'].map(u => fetch(u + q, {cache:'no-store'}).then(r => r.json())));
+      $$('[data-h]').forEach(x => delete x.dataset.h);
+      delete $('#agCards').dataset.ok;
+      $$('.scrim').forEach(s => s.classList.remove('on'));
+      ultimoAgente = null;
+      const em = ORG.empresa;
+      $('#tenant').textContent = em.iniciales; $('#tenant').title = `${em.nombre} · empresa ficticia`;
+      $('#crumbEmp').textContent = em.corto;
+      document.title = `${em.corto} · Org Redesign Studio`;
+      $$('.nPers').forEach(x => x.textContent = n0(empresa.personas));
+      $('#sbInfo').textContent = `${em.nombre} · ${n0(empresa.personas)} posiciones · empresa ficticia con datos sintéticos`;
+      botones();
+    } finally { cargando = null; render(); }
+  })();
+  return cargando;
+}
+function botones(){
+  if (!TOKEN || !empresa) return;
+  const b = $('#bVivo');
+  b.title = empresa.vivo_disponible ? 'Lanza los 6 agentes con la API de Claude' : 'Falta ANTHROPIC_API_KEY en el servidor';
+  $('#bGrab').title = empresa.grabacion_disponible ? 'Repite la última corrida en vivo de esta empresa con su ritmo original' : 'Todavía no hay grabación de esta empresa: usará el guion de respaldo';
+}
 $('#bQR').onclick = () => {
   const url = location.origin + '/';
   $('#qrurl').textContent = url.replace(/^https?:\/\//, '');
@@ -1017,14 +1197,11 @@ $('#bQR').onclick = () => {
 $$('.tab[data-view], .rail .it[data-view]').forEach(b => b.addEventListener('click', () => { irA._manual = true; }));
 
 (async () => {
-  [empresa, ORG, CFG] = await Promise.all(['/api/empresa', '/api/organizacion', '/api/agentes'].map(u => fetch(u).then(r => r.json())));
-  $('#sbInfo').textContent = `${n0(empresa.personas)} posiciones · empresa ficticia con datos sintéticos`;
+  await cargarEmpresa();
   if (TOKEN){
-    if (!empresa.vivo_disponible){ const b = $('#bVivo'); b.disabled = true; b.title = 'Falta ANTHROPIC_API_KEY en el servidor'; }
-    if (!empresa.grabacion_disponible) $('#bGrab').title = 'Todavía no hay grabación: usará el guion de respaldo';
     const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js'; document.head.appendChild(s);
   } else { $('#bQR').style.display = 'none'; }
-  if (!E) E = estadoInicial();
+  if (!E) E = estadoInicial(ORG?.empresa?.id);
   render();
   conectar();
 })();

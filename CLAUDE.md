@@ -1,8 +1,10 @@
 # Org Redesign Studio
 
 App web de demostración: seis agentes de IA rediseñan la organización de una empresa
-FICTICIA de consumo masivo peruana (Consumo Andino S.A.A., 3,744 personas) hacia un
-modelo producto-plataforma, ajustando span & layers. La interfaz muestra en vivo cómo
+FICTICIA hacia un modelo producto-plataforma, ajustando span & layers. Hay cuatro empresas
+(todas con datos sintéticos) y el presentador elige una en la primera vista: Consumo Andino
+(consumo masivo, Perú), Banco Cumbre (banca, México), Tiendas Esquina (retail de proximidad,
+México) y Cóndor Telecom (telecomunicaciones, Colombia). La interfaz muestra en vivo cómo
 trabajan los agentes. Se usa en demos en vivo frente a audiencias de negocio:
 **todo cambio debe ser pequeño, seguro y verificable en menos de 3 minutos.**
 
@@ -10,12 +12,13 @@ trabajan los agentes. Se usa en demos en vivo frente a audiencias de negocio:
 
 | Archivo | Qué hace |
 |---|---|
-| `app/motor.py` | Toda la aritmética: diagnóstico, mapa de capacidades, validación del modelo, diseño del organigrama desde la base (`disenar_org`), riesgos del CHRO (`revisar_riesgos`), impacto. Determinístico. |
+| `app/empresas.py` | Configuración de cada empresa: capacidades, líneas de producto, grupos de áreas, qué no debe mezclarse en un bloque, brief del CEO, perfil del CHRO, modelo de respaldo y guion. Para agregar una empresa: un constructor en `generar_org.py` + una entrada aquí. |
+| `app/motor.py` | Toda la aritmética (cada función recibe la empresa): diagnóstico, mapa de capacidades, validación del modelo, diseño del organigrama desde la base (`disenar_org`), riesgos del CHRO (`revisar_riesgos`), impacto. Determinístico. |
 | `app/agentes.py` | Prompts, herramientas y orquestación de los 6 agentes. Modos: `vivo` (API de Claude), `guion` (plan B sin IA, textos pre-escritos con números reales) y `grabacion` (repite la última corrida en vivo de `runs/`). |
 | `app/bus.py` | Eventos y estado de la corrida. `aplicar()` es el reducer; `static/index.html` tiene un espejo en JS (`aplicar`) que debe mantenerse igual. |
-| `static/index.html` | Interfaz completa en un solo archivo (HTML + CSS + JS, sin build, sin dependencias). Dibuja con SVG a mano. Tres vistas: Organización actual, Rediseño con agentes y Cómo funciona (con el popup de configuración de cada agente). |
-| `app/main.py` | FastAPI: `/` interfaz, `/api/eventos` SSE, `/api/organizacion` (vista previa a la corrida), `/api/agentes` (configuración visible de cada agente), `/api/correr?modo=…&token=…`, `/api/reiniciar`, `/api/descargar/{actual|propuesta}.csv`. |
-| `app/generar_org.py` | Genera la organización sintética (semilla fija). |
+| `static/index.html` | Interfaz completa en un solo archivo (HTML + CSS + JS, sin build, sin dependencias). Dibuja con SVG a mano. Tres vistas: Organización actual (con el selector de empresa), Rediseño con agentes (cabe en una sola pantalla desde 1100 px de ancho: no agregues tarjetas que la hagan crecer) y Cómo funciona (con el popup de configuración de cada agente). |
+| `app/main.py` | FastAPI: `/` interfaz, `/api/eventos` SSE, `/api/empresa`, `/api/organizacion` y `/api/agentes` (aceptan `?empresa=`), `/api/seleccionar?empresa=…&token=…` (cambia la empresa en todas las pantallas), `/api/correr?modo=…&token=…`, `/api/reiniciar`, `/api/descargar/{actual|propuesta}.csv`. |
+| `app/generar_org.py` | Genera las cuatro organizaciones sintéticas (semillas fijas). |
 
 Flujo de una corrida: Diagnóstico + Capacidades (en paralelo) → Diseñador → Optimizador → Impacto → CHRO.
 Si el CHRO objeta, hay una ronda 2 (Diseñador → Optimizador → Impacto → CHRO).
@@ -36,10 +39,12 @@ Los datos que ve la interfaz llegan como eventos `{"type":"data","key":…}` con
 - No agregues dependencias ni pasos de build. La interfaz sigue siendo un solo archivo.
 - Si agregas un tipo de evento o una llave de estado, actualiza `bus.aplicar` Y el `aplicar` de `index.html`.
 - Si cambias reglas del motor que afectan el guion de respaldo, revisa que los textos de `correr_guion` sigan siendo ciertos.
+- El guion de respaldo es el mismo para las cuatro empresas: arma sus textos con los números del motor y con `Empresa.guion`. `python3 -m app.prueba` lo corre para las cuatro.
+- Las grabaciones se guardan por empresa: `runs/<empresa>-corrida-*.jsonl`.
 
 ## Cómo verificar (siempre, después de cada cambio)
 
 ```
-python3 -m app.prueba                 # corrida completa sin IA a alta velocidad; debe imprimir "OK · …"
+python3 -m app.prueba                 # corrida sin IA de las 4 empresas a alta velocidad; debe imprimir 4 líneas "OK · …"
 uvicorn app.main:app --port 8000      # luego abre http://localhost:8000/?admin=demo y corre el guion
 ```

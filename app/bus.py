@@ -22,8 +22,9 @@ AGENTES = [
 ]
 
 
-def estado_inicial() -> dict:
+def estado_inicial(empresa: str = "cpg") -> dict:
     return {
+        "empresa": empresa,
         "corrida": {"estado": "lista", "modo": None, "inicio": None, "fin": None, "fase": "Esperando al partner"},
         "agentes": {a["id"]: {**a, "estado": "en espera", "texto": "", "herramientas": [], "ronda": 1}
                     for a in AGENTES},
@@ -34,12 +35,13 @@ def estado_inicial() -> dict:
 
 def aplicar(estado: dict, ev: dict) -> None:
     t = ev["type"]
-    if t == "reset":
-        nuevo = estado_inicial()
+    if t in ("reset", "empresa"):
+        # "empresa": el presentador cambió de organización; la corrida anterior ya no aplica
+        nuevo = estado_inicial(ev.get("empresa") or estado.get("empresa", "cpg"))
         estado.clear()
         estado.update(nuevo)
     elif t == "run_start":
-        nuevo = estado_inicial()
+        nuevo = estado_inicial(estado.get("empresa", "cpg"))
         estado.clear()
         estado.update(nuevo)
         estado["corrida"].update({"estado": "corriendo", "modo": ev.get("modo"), "inicio": ev["ts"]})
@@ -92,16 +94,16 @@ class Bus:
     def snapshot(self) -> dict:
         return copy.deepcopy(self.estado)
 
-    def guardar_grabacion(self, carpeta: str) -> str | None:
+    def guardar_grabacion(self, carpeta: str, prefijo: str = "cpg") -> str | None:
         if not self.grabacion:
             return None
         os.makedirs(carpeta, exist_ok=True)
-        ruta = os.path.join(carpeta, time.strftime("corrida-%Y%m%d-%H%M%S.jsonl"))
+        ruta = os.path.join(carpeta, f"{prefijo}-" + time.strftime("corrida-%Y%m%d-%H%M%S.jsonl"))
         with open(ruta, "w", encoding="utf-8") as f:
             for ev in self.grabacion:
                 f.write(json.dumps(ev, ensure_ascii=False) + "\n")
         return ruta
 
     def reiniciar(self) -> None:
-        self.estado = estado_inicial()
+        self.estado = estado_inicial(self.estado.get("empresa", "cpg"))
         self.grabacion = []

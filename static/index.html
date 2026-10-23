@@ -569,6 +569,8 @@ const n0 = v => v == null ? '—' : Math.round(v).toLocaleString('en-US');
 const n1 = v => v == null ? '—' : Number(v).toLocaleString('en-US', {minimumFractionDigits:1, maximumFractionDigits:1});
 const money = v => v == null ? '—' : `$${n1(v)}M`;
 const signed = (v, dec = 1, suf = '%') => v == null ? '' : (v > 0 ? '+' : v < 0 ? MINUS : '') + Math.abs(v).toFixed(dec) + suf;
+// Markdown mínimo de los agentes → HTML seguro: **negrita**, viñetas "- " y encabezados "#"
+const md = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/^\s*[-*] /gm, '• ').replace(/^#+\s*/gm, '');
 const ico = (id, cls = 'sm') => `<svg class="ico ${cls}"><use href="#i-${id}"/></svg>`;
 function delta(pct, mejor){ // mejor: 'baja' | 'sube'
   if (pct == null || !isFinite(pct)) return '';
@@ -817,7 +819,7 @@ function agentes(){
     if (act && !el.classList.contains('act') && vista === 'run' && cont.scrollHeight > cont.clientHeight) cont.scrollTo({top: el.offsetTop - cont.offsetTop - 4, behavior: 'smooth'});
     el.classList.toggle('act', act);
     const txt = el.querySelector('.txt'), limpio = a.texto.trim();
-    if (txt.textContent !== limpio){ txt.textContent = limpio; txt.scrollTop = txt.scrollHeight; }
+    if (txt.dataset.raw !== limpio){ txt.dataset.raw = limpio; txt.innerHTML = md(limpio); txt.scrollTop = txt.scrollHeight; }
     const hh = a.herramientas[a.herramientas.length - 1];
     const th = hh ? `${ico('zap','xs')}<span title="${esc(hh.resumen)}">${esc(hh.resumen)}</span>` : '';
     const tl = el.querySelector('.tool'); if (tl.dataset.h !== th){ tl.dataset.h = th; tl.innerHTML = th; }
@@ -957,7 +959,7 @@ function pintarModal(){
     const st = E?.agentes?.[a.id];
     if (!st || (!st.texto && !st.herramientas.length)) h = `<div class="empty">${ico('brainc','')}<div class="body-sm">Este agente todavía no trabaja en esta corrida.</div></div>`;
     else h = `<div class="overline" style="margin-bottom:6px">Herramientas que llamó</div>${st.herramientas.map((x, i) => `<div class="signal info" style="padding:8px 12px;margin-bottom:6px"><div class="ic" style="width:24px;height:24px">${ico('zap','xs')}</div><div><span class="mono">${esc(x.herramienta)}</span><div class="caption">${esc(x.resumen)}</div></div></div>`).join('') || '<div class="caption">Ninguna todavía.</div>'}
-      <div class="overline" style="margin:14px 0 6px">Lo que escribió</div><div class="codebox" style="font-family:var(--rgmx-font-sans);font-size:13px">${esc(st.texto.trim()) || '—'}</div>`;
+      <div class="overline" style="margin:14px 0 6px">Lo que escribió</div><div class="codebox" style="font-family:var(--rgmx-font-sans);font-size:13px">${md(st.texto.trim()) || '—'}</div>`;
   }
   $('#mBody').innerHTML = h;
 }

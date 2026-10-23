@@ -35,7 +35,8 @@ ESTILO = (
     "Escribes en español para 50 gerentes que leen tu texto proyectado en vivo. Frases cortas. "
     "Antes de usar una herramienta, di en una línea qué vas a hacer. Después de los resultados, da "
     "máximo 5 viñetas con números concretos. Nada de introducciones ni despedidas. Nunca inventes cifras: "
-    "usa solo las que devuelven las herramientas. Nunca comentes sobre las herramientas, las llamadas o el "
+    "usa solo las que devuelven las herramientas. Texto plano: viñetas con '•' y sin markdown (sin asteriscos "
+    "ni títulos con #). Nunca comentes sobre las herramientas, las llamadas o el "
     "sistema: si algo falla, corrígelo sin mencionarlo."
 )
 
